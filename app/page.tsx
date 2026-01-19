@@ -29,16 +29,13 @@ export default function Home() {
     setLoading(false);
   };
 
-  // const copyToClipboard = () => {
-  //   navigator.clipboard.writeText(roast);
-  //   setCopied(true);
-  //   setTimeout(() => setCopied(false), 2000);
-  // };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(roast);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
     alert("Roast copied to clipboard! Go shame yourself on social media.");
-    };
+
+  };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -103,7 +100,7 @@ export default function Home() {
                 </h3>
                 <div className="flex gap-2">
                   <button onClick={copyToClipboard} className="p-2 hover:bg-zinc-800 rounded-md transition text-zinc-400">
-                    {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />
+                    {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
                   </button>
                   <button className="p-2 hover:bg-zinc-800 rounded-md transition text-zinc-400">
                     <Share2 size={18} />
