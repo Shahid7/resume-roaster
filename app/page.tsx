@@ -59,25 +59,23 @@ export default function Home() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl w-full space-y-8 z-10"
-      
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-orange-500 mb-2">
-          <p className="text-zinc-500 text-sm">
-  Built with 🔥 by{" "}
-  <span className="relative group cursor-pointer inline-block">
-    <span className="relative z-10 font-medium transition-colors group-hover:text-white px-2 py-1">
-      Shahid Ali
+      >
+        {/* Line 63: Make sure the opening div has a matching closing </div> later */}
+<div className="text-center space-y-3">
+  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-orange-500 mb-2">
+     AI Analysis Active
+  </div> {/* <-- Make sure this is closed! */}
+
+  <p className="text-zinc-500 text-sm">
+    Built with 🔥 by{" "}
+    <span className="relative group cursor-pointer inline-block">
+      <span className="relative z-10 font-medium transition-colors group-hover:text-white px-2 py-1">
+        Shahid Ali
+      </span>
+      <span className="absolute inset-0 bg-orange-600 scale-0 group-hover:scale-100 transition-transform duration-300 ease-out -rotate-2 rounded-tl-2xl rounded-br-2xl -z-0"></span>
     </span>
-    {/* This is the unique shape that appears on hover */}
-    <span className="absolute inset-0 bg-orange-600 scale-0 group-hover:scale-100 transition-transform duration-300 ease-out -rotate-2 rounded-tl-2xl rounded-br-2xl -z-0"></span>
-  </span>
-</p>
-          </div>
-          <h1 className="text-5xl font-extrabold tracking-tight bg-gradient-to-br from-white via-zinc-400 to-zinc-600 bg-clip-text text-transparent">
-            Resume <span className="text-orange-500">Roaster</span>
-          </h1>
-          <p className="text-zinc-500 text-lg">Your ticket to a better job through emotional damage.</p>
-        </div>
+  </p>
+</div>
 
         <div className="relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
