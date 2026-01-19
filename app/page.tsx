@@ -61,6 +61,7 @@ export default function Home() {
         className="max-w-2xl w-full space-y-8 z-10"
       
         <div className="text-center space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-orange-500 mb-2">
           <p className="text-zinc-500 text-sm">
   Built with 🔥 by{" "}
   <span className="relative group cursor-pointer inline-block">
@@ -71,6 +72,7 @@ export default function Home() {
     <span className="absolute inset-0 bg-orange-600 scale-0 group-hover:scale-100 transition-transform duration-300 ease-out -rotate-2 rounded-tl-2xl rounded-br-2xl -z-0"></span>
   </span>
 </p>
+          </div>
           <h1 className="text-5xl font-extrabold tracking-tight bg-gradient-to-br from-white via-zinc-400 to-zinc-600 bg-clip-text text-transparent">
             Resume <span className="text-orange-500">Roaster</span>
           </h1>
