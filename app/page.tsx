@@ -103,8 +103,7 @@ export default function Home() {
                 </h3>
                 <div className="flex gap-2">
                   <button onClick={copyToClipboard} className="p-2 hover:bg-zinc-800 rounded-md transition text-zinc-400">
-                    {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
-                    Copy Roast to Clipboard 📋
+                    {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />
                   </button>
                   <button className="p-2 hover:bg-zinc-800 rounded-md transition text-zinc-400">
                     <Share2 size={18} />
