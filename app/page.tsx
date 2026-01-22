@@ -1,263 +1,231 @@
 "use client";
-import { useState, ChangeEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Flame, Terminal, Loader2, Copy, Trash2, Check, Share2, CheckCircle, Info, Upload } from "lucide-react";
-import { toast } from 'sonner';
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu } from 'lucide-react';
 
+// 1. SCRAMBLE COMPONENT
+const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number }) => {
+  const [displayText, setDisplayText] = useState(text);
+  const chars = "!@#$%^&*()_+NKJHIU87654321";
 
+  useEffect(() => {
+    let iteration = 0;
+    const trigger = setInterval(() => {
+      setDisplayText(prev => 
+        prev.split("").map((letter, index) => {
+          if (index < iteration) return text[index];
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join("")
+      );
+      if (iteration >= text.length) clearInterval(trigger);
+      iteration += 1 / 3;
+    }, interval);
+    return () => clearInterval(trigger);
+  }, [text, interval]);
 
-export default function Home() {
-  const [resumeText, setResumeText] = useState<string>("");
-  const [roast, setRoast] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [copied, setCopied] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  return <span className="font-mono">{displayText}</span>;
+};
 
-  const handleClear = () => {
-    setResumeText("");
-    setRoast("");
-    // Reset the file input visually
-    const fileInput = document.getElementById('resume-upload') as HTMLInputElement;
-    if (fileInput) fileInput.value = "";
-    toast.success("Ready for the next victim! 💀");
-  };
+// 2. PROJECT DATA (30 DAYS)
+const PROJECTS = [
+  {
+    title: "Resume Roaster",
+    desc: "Brutal AI feedback on your CV. Not for the faint of heart.",
+    path: "/roast",
+    icon: <Flame />,
+    vibe: "chaos",
+    status: "unlocked",
+    date: "LIVE",
+    color: "from-orange-500/20 to-red-500/20"
+  },
+  {
+    title: "Palette Genie",
+    desc: "Deep-learning color harmonies for designers and hackers.",
+    path: "/palette",
+    icon: <Palette />,
+    vibe: "neutral",
+    status: "locked",
+    date: "JAN 23",
+    color: "from-cyan-500/20 to-blue-500/20"
+  },
+  {
+    title: "Naseeha AI",
+    desc: "Finding peace in the digital age with spiritual wisdom.",
+    path: "/naseeha",
+    icon: <Sparkles />,
+    vibe: "peace",
+    status: "locked",
+    date: "JAN 24",
+    color: "from-emerald-500/20 to-teal-500/20"
+  },
+  ...Array.from({ length: 27 }).map((_, i) => ({
+    title: `Project ${i + 4}`,
+    desc: "A classified AI experiment currently in development.",
+    path: "#",
+    icon: <Cpu />,
+    vibe: "neutral",
+    status: "locked",
+    date: `JAN ${25 + i > 31 ? (i - 5) + " FEB" : 25 + i}`,
+    color: "from-zinc-500/10 to-zinc-800/10"
+  }))
+];
 
-  const handleRoast = async (text?: string) => {
-    const contentToRoast = text || resumeText;
-    if (!contentToRoast) return;
+export default function HomeHub() {
+  const [vibe, setVibe] = useState<'chaos' | 'peace'>('chaos');
+  const [scrambleName, setScrambleName] = useState("Shahid Ali Sethi");
+  
+  // SECRET GLITCH LOGIC
+  const [glitch, setGlitch] = useState(false);
+  const clickCount = useRef(0);
 
-    setLoading(true);
-    setRoast("");
-
-    try {
-      const res = await fetch("/api/roast", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resumeText: contentToRoast }),
-      });
-      const data = await res.json();
-      setRoast(data.reply);
-    } catch (err) {
-      setRoast("The AI is speechless.");
+  const triggerSecret = () => {
+    clickCount.current += 1;
+    if (clickCount.current >= 3) {
+      setGlitch(true);
+      setTimeout(() => {
+        setGlitch(false);
+        clickCount.current = 0;
+      }, 1500); // Glitch duration
     }
-    setLoading(false);
+    // Reset counter if user stops clicking for 2 seconds
+    setTimeout(() => { if(!glitch) clickCount.current = 0; }, 2000);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-  
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-  
-    try {
-      const response = await fetch('/api/roast', { // We use the same route
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
-  
-      if (data.text) {
-        setResumeText(data.text); // Save text to state
-        toast.success("Resume Loaded!", { description: "Click the ROAST ME button to begin the carnage." });
-      }
-    } catch (err) {
-      toast.error("Upload failed");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-  
-
-  const funMessages = [
-    "Go ahead, share your shame on social media. 💀",
-    "Copied! Now go show your mom why you're still unemployed.",
-    "Your failure has been saved to your clipboard.",
-    "Ready to post? Don't forget to tag your ex-boss."
-  ];
-  
-  const copyToClipboard = (text: string) => {
-    const randomMessage = funMessages[Math.floor(Math.random() * funMessages.length)];
-    navigator.clipboard.writeText(text);
-    
-    toast.info('Copied to Clipboard', {
-      description: randomMessage,
-      style: { background: '#18181b', color: '#fff', border: '1px solid #3f3f46' }
-    });
-  };
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setScrambleName("Shahid Ali Sethi"); 
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Visual background elements */}
-      <div className="absolute inset-0 z-0 opacity-20" 
-           style={{ backgroundImage: `radial-gradient(circle at 2px 2px, #3f3f46 1px, transparent 0)`, backgroundSize: '24px 24px' }}></div>
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-600/10 blur-[120px] rounded-full"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-600/10 blur-[120px] rounded-full"></div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl w-full space-y-8 z-10"
-      >
-        <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-orange-500 mb-2">
-  <Terminal size={12} /> 
-  <span>Built with ⚡️ by</span>
-  
-  <span className="relative group cursor-pointer ml-1">
-    <span className="relative z-10 transition-colors group-hover:text-white px-1">
-      Shahid Ali
-    </span>
-    {/* This is your unique hover shape */}
-    <span className="absolute inset-0 bg-orange-600 scale-0 group-hover:scale-110 transition-transform duration-200 ease-out -rotate-3 rounded-sm -z-0"></span>
-  </span>
-</div>
-          <h1 className="text-5xl font-extrabold tracking-tight bg-gradient-to-br from-white via-zinc-400 to-zinc-600 bg-clip-text text-transparent">
-            Resume <span className="text-orange-500">Roaster</span>
-          </h1>
-          <p className="text-zinc-500 text-lg">Your ticket to a better job through emotional damage.</p>
-        </div>
-
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-          <div className="relative bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-            {/* <textarea
-              value={resumeText}
-              onChange={(e) => setResumeText(e.target.value)}
-              placeholder="Drop your 'experience' here..."
-              className="w-full h-56 bg-transparent p-6 focus:outline-none text-zinc-300 placeholder:text-zinc-700 resize-none leading-relaxed"
-            /> */}
-  <div 
-  className="border-2 border-dashed border-zinc-800 rounded-xl p-8 text-center hover:border-orange-500 transition-colors"
-  onDragOver={(e) => e.preventDefault()} // Stops browser from opening file
-  onDrop={(e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      // Manually trigger the file upload logic
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      const input = document.getElementById('resume-upload') as HTMLInputElement;
-      if (input) {
-        input.files = dataTransfer.files;
-        handleFileUpload({ target: input } as any);
-      }
-    }
-  }}
->
-  <input 
-    type="file" 
-    accept=".pdf" 
-    onChange={handleFileUpload} 
-    className="hidden" 
-    id="resume-upload" 
-  />
-  <label htmlFor="resume-upload" className="cursor-pointer flex flex-col items-center">
-    <Upload className="w-10 h-10 text-zinc-500 mb-2" />
-    <span className="text-sm text-zinc-400">
-      {isUploading ? "Reading your secrets..." : resumeText ? "PDF Loaded! Click Roast Me ↓" : "Drop your PDF here or click to upload"}
-    </span>
-  </label>
-</div>
-          </div>
-        </div>
+    <main className={`min-h-screen transition-all duration-1000 ${
+      vibe === 'chaos' ? 'bg-[#050505]' : 'bg-[#020617]'
+    } ${glitch ? 'animate-pulse contrast-200 hue-rotate-90' : ''} text-white relative overflow-hidden cyber-grid py-20 px-6`}>
       
-      {/* playful badge for the user */}
-        {resumeText && (
-  <motion.div 
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="flex items-center justify-between px-4 py-2 mb-4 rounded-lg bg-zinc-900/50 border border-zinc-800"
-  >
-    <div className="flex items-center gap-3">
-      {/* Animated Pulse Dot */}
-      <div className="relative flex h-2 w-2">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+      {/* 1. THE TOGGLE */}
+      <div className="relative z-50 flex bg-zinc-900/80 backdrop-blur-md p-1 rounded-full w-fit mx-auto mb-10 border border-zinc-800 shadow-2xl">
+        <button 
+          onClick={() => setVibe('chaos')}
+          className={`px-8 py-2.5 rounded-full text-xs font-black tracking-widest transition-all duration-300 ${
+            vibe === 'chaos' ? 'bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)]' : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+        >
+          CHAOS
+        </button>
+        <button 
+          onClick={() => setVibe('peace')}
+          className={`px-8 py-2.5 rounded-full text-xs font-black tracking-widest transition-all duration-300 ${
+            vibe === 'peace' ? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+        >
+          PEACE
+        </button>
       </div>
-      
-      <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">
-        Intelligence Extracted
-      </span>
-    </div>
 
-    <div className="flex items-baseline gap-1">
-      <span className="text-xl font-mono font-black text-white">
-        {resumeText.length.toLocaleString()}
-      </span>
-      <span className="text-[10px] text-zinc-600 font-bold uppercase">Chars</span>
-    </div>
-  </motion.div>
-)}
+      {/* 2. AMBIENT BACKGROUND */}
+      <motion.div 
+        animate={{ 
+          backgroundColor: vibe === 'chaos' ? "rgba(249, 115, 22, 0.15)" : "rgba(16, 185, 129, 0.15)",
+          scale: [1, 1.1, 1],
+        }}
+        transition={{ backgroundColor: { duration: 1 }, scale: { duration: 8, repeat: Infinity, ease: "easeInOut" } }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] blur-[120px] rounded-full"
+      />
 
-<button
-  onClick={() => handleRoast()}
-  // Disable if: 1. Loading, 2. No resume text, OR 3. Roast already exists
-  disabled={loading || !resumeText || !!roast} 
-  className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 
-    ${(loading || !resumeText || roast) 
-      ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50' 
-      : 'bg-white text-black hover:bg-orange-500 hover:text-white shadow-xl shadow-orange-500/20'}`}
->
-  {loading ? (
-    <><Loader2 className="animate-spin" /> Analyzing your failures ... </>
-  ) : roast ? (
-    <><CheckCircle size={20} /> ALREADY ROASTED</>
-  ) : (
-    <><Flame size={20} /> ROAST ME</>
-  )}
-</button>
+      <div className="max-w-6xl mx-auto relative z-10">
+        <header className="text-center mb-20">
+          <div className="inline-block px-4 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 text-zinc-500 text-xs font-bold tracking-[0.3em] mb-6 uppercase">
+            The Experiment Lab v1.0
+          </div>
 
-        
+          <motion.h1 
+            key={vibe}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-6xl md:text-8xl font-black tracking-tighter mb-6 italic"
+          >
+            {vibe === 'chaos' ? (
+               <span>BUILD <span className="text-orange-500">&</span> DESTROY.</span>
+               ) : (
+                 <span>SEEK <span className="text-emerald-500">&</span> REFLECT.</span>
+               )}
+          </motion.h1>
 
-        <AnimatePresence mode="wait">
-          {roast && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative p-8 bg-zinc-900/50 backdrop-blur-xl border border-orange-500/20 rounded-2xl overflow-hidden"
+          <p className="text-zinc-400 max-w-xl mx-auto text-lg mb-12">
+            {vibe === 'chaos' 
+              ? "Enter the lab where resumes go to die and AI reigns supreme." 
+              : "A sanctuary for spiritual growth and creative harmony."}
+          </p>
+        </header>
+
+        {/* 3. THE 30-DAY GRID */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {PROJECTS.map((project, index) => {
+            const isLocked = project.status === "locked";
+            const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
+
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ 
+                  opacity: isHidden ? 0.1 : 1,
+                  scale: isHidden ? 0.95 : 1,
+                  filter: isHidden ? "grayscale(100%)" : "grayscale(0%)"
+                }}
+                className={`relative group rounded-3xl border transition-all duration-500 overflow-hidden ${
+                  isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
+                }`}
+              >
+                {isLocked && (
+                  <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="p-3 bg-zinc-900/80 rounded-full border border-zinc-800 mb-2">
+                      <Lock size={18} className="text-zinc-600" />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-zinc-500 tracking-widest">
+                      UNLOCKS {project.date}
+                    </span>
+                  </div>
+                )}
+
+                <Link href={isLocked ? "#" : project.path} className={`block p-8 h-full ${isLocked ? 'cursor-not-allowed' : ''}`}>
+                  <div className="relative z-10">
+                    <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-colors ${!isLocked && 'group-hover:border-orange-500/50'}`}>
+                      {project.icon}
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 flex items-center gap-2">
+                      {project.title} 
+                      {!isLocked && <ArrowRight size={18} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-orange-500" />}
+                    </h3>
+                    <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
+                      {project.desc}
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* 4. FOOTER WITH SCRAMBLE NAME + SECRET TRIGGER */}
+        <footer className="mt-32 pt-10 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="text-zinc-600 text-sm font-mono">
+            &copy; {new Date().getFullYear()} — Hand-coded by 
+            <span 
+              onClick={triggerSecret} 
+              className="text-white font-bold cursor-pointer ml-1 hover:text-orange-500 transition-colors"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-orange-500 font-bold flex items-center gap-2 uppercase tracking-widest text-sm">
-                  💀 Recruitment Verdict
-                </h3>
-                <div className="flex gap-2">
-                  <button onClick={() => copyToClipboard(roast)} className="p-2 hover:bg-zinc-800 rounded-md transition text-zinc-400">
-                    {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
-                  </button>
-                  <button className="p-2 hover:bg-zinc-800 rounded-md transition text-zinc-400">
-                    <Share2 size={18} />
-                  </button>
-                  
-                </div>
-              </div>
-              <p className="text-zinc-300 leading-relaxed italic text-lg font-medium">
-                "{roast}"
-              </p>
-              <motion.button
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  onClick={handleClear}
-  className="group relative flex items-center gap-2 px-6 py-3 mt-8 mx-auto bg-transparent border border-zinc-800 rounded-full text-zinc-500 hover:text-red-500 hover:border-red-500/50 transition-all duration-300"
->
-  {/* The icon spins on hover */}
-  <motion.div className="group-hover:rotate-180 transition-transform duration-500">
-    <Trash2 size={16} />
-  </motion.div>
-  
-  <span className="text-xs font-bold uppercase tracking-widest">
-    Burn the Evidence & Try Again
-  </span>
-
-  {/* Subtle glow effect on hover */}
-  <div className="absolute inset-0 rounded-full bg-red-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-</motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </div>
+              <ScrambleText text={scrambleName} />
+            </span>
+          </div>
+          <div className="flex gap-4">
+            <a href="#" className="p-2 text-zinc-500 hover:text-white transition-colors"><Github size={20} /></a>
+            <a href="#" className="p-2 text-zinc-500 hover:text-white transition-colors"><Twitter size={20} /></a>
+          </div>
+        </footer>
+      </div>
+    </main>
   );
 }
