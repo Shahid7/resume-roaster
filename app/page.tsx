@@ -46,7 +46,7 @@ const PROJECTS = [
     icon: <Palette />,
     vibe: "neutral",
     status: "locked",
-    date: "JAN 23",
+    date: "JAN 24",
     color: "from-cyan-500/20 to-blue-500/20"
   },
   {
@@ -56,19 +56,25 @@ const PROJECTS = [
     icon: <Sparkles />,
     vibe: "peace",
     status: "locked",
-    date: "JAN 24",
+    date: "JAN 25",
     color: "from-emerald-500/20 to-teal-500/20"
   },
-  ...Array.from({ length: 27 }).map((_, i) => ({
-    title: `Project ${i + 4}`,
-    desc: "A classified AI experiment currently in development.",
-    path: "#",
-    icon: <Cpu />,
-    vibe: "neutral",
-    status: "locked",
-    date: `JAN ${25 + i > 31 ? (i - 5) + " FEB" : 25 + i}`,
-    color: "from-zinc-500/10 to-zinc-800/10"
-  }))
+  ...Array.from({ length: 27 }).map((_, i) => {
+    const dayNumber = 26 + i; // Start from Jan 24
+    const isFeb = dayNumber > 31;
+    const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
+    
+    return {
+      title: `Project ${i + 4}`,
+      desc: "A classified AI experiment currently in development.",
+      path: "#",
+      icon: <Cpu />,
+      vibe: "neutral",
+      status: "locked",
+      date: displayDate,
+      color: "from-zinc-500/10 to-zinc-800/10"
+    };
+  })
 ];
 
 export default function HomeHub() {
@@ -79,9 +85,23 @@ export default function HomeHub() {
   const [glitch, setGlitch] = useState(false);
   const clickCount = useRef(0);
 
+  const playSound = (url: string, volume = 0.2) => {
+    try {
+      const audio = new Audio(url);
+      audio.volume = volume;
+      audio.play().catch(() => {});
+    } catch (e) {}
+  };
+
+  const handleVibeChange = (newVibe: 'chaos' | 'peace') => {
+    playSound("https://assets.mixkit.co/active_storage/sfx/1113/1113-preview.mp3", 0.3);
+    setVibe(newVibe);
+  };
+
   const triggerSecret = () => {
     clickCount.current += 1;
     if (clickCount.current >= 3) {
+      playSound("https://assets.mixkit.co/active_storage/sfx/3116/3116-preview.mp3", 0.5);
       setGlitch(true);
       setTimeout(() => {
         setGlitch(false);
@@ -107,7 +127,7 @@ export default function HomeHub() {
       {/* 1. THE TOGGLE */}
       <div className="relative z-50 flex bg-zinc-900/80 backdrop-blur-md p-1 rounded-full w-fit mx-auto mb-10 border border-zinc-800 shadow-2xl">
         <button 
-          onClick={() => setVibe('chaos')}
+          onClick={() => handleVibeChange('chaos')}
           className={`px-8 py-2.5 rounded-full text-xs font-black tracking-widest transition-all duration-300 ${
             vibe === 'chaos' ? 'bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)]' : 'text-zinc-500 hover:text-zinc-300'
           }`}
@@ -115,7 +135,7 @@ export default function HomeHub() {
           CHAOS
         </button>
         <button 
-          onClick={() => setVibe('peace')}
+          onClick={() => handleVibeChange('peace')}
           className={`px-8 py-2.5 rounded-full text-xs font-black tracking-widest transition-all duration-300 ${
             vibe === 'peace' ? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'text-zinc-500 hover:text-zinc-300'
           }`}
@@ -136,8 +156,8 @@ export default function HomeHub() {
 
       <div className="max-w-6xl mx-auto relative z-10">
         <header className="text-center mb-20">
-          <div className="inline-block px-4 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 text-zinc-500 text-xs font-bold tracking-[0.3em] mb-6 uppercase">
-            The Experiment Lab v1.0
+          <div className="inline-block px-4 py-1 rounded-full border border-zinc-800 bg-zinc-900/50 text-zinc-500 text-[10px] font-black tracking-[0.4em] mb-6 uppercase">
+          SHAHID_LABS // SESSION_01
           </div>
 
           <motion.h1 
@@ -180,16 +200,13 @@ export default function HomeHub() {
                 }`}
               >
                 {isLocked && (
-                  <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
-                    <div className="p-3 bg-zinc-900/80 rounded-full border border-zinc-800 mb-2">
-                      <Lock size={18} className="text-zinc-600" />
+                    <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
+                      <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
+                        <Lock size={12} className="text-zinc-600" />
+                      </div>
+                      <span className="text-[7px] font-bold text-zinc-600 tracking-widest">{project.date}</span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-zinc-500 tracking-widest">
-                      UNLOCKS {project.date}
-                    </span>
-                  </div>
-                )}
-
+                  )}
                 <Link href={isLocked ? "#" : project.path} className={`block p-8 h-full ${isLocked ? 'cursor-not-allowed' : ''}`}>
                   <div className="relative z-10">
                     <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-colors ${!isLocked && 'group-hover:border-orange-500/50'}`}>
@@ -221,8 +238,8 @@ export default function HomeHub() {
             </span>
           </div>
           <div className="flex gap-4">
-            <a href="#" className="p-2 text-zinc-500 hover:text-white transition-colors"><Github size={20} /></a>
-            <a href="#" className="p-2 text-zinc-500 hover:text-white transition-colors"><Twitter size={20} /></a>
+            <a href="https://github.com/Shahid7" className="p-2 text-zinc-500 hover:text-white transition-colors"><Github size={20} /></a>
+            <a href="https://x.com/shahid_alisethi" className="p-2 text-zinc-500 hover:text-white transition-colors"><Twitter size={20} /></a>
           </div>
         </footer>
       </div>
