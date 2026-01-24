@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu } from 'lucide-react';
+import { Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2 } from 'lucide-react';
 
 // 1. SCRAMBLE COMPONENT
 const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number }) => {
@@ -41,13 +41,13 @@ const PROJECTS = [
   },
   {
     title: "Palette Genie",
-    desc: "Deep-learning color harmonies for designers and hackers.",
+    desc: "Neural-linked harmonies. (Careful, the lamp is hot...)",
     path: "/palette",
     icon: <Palette />,
-    vibe: "neutral",
-    status: "locked",
-    date: "JAN 24",
-    color: "from-cyan-500/20 to-blue-500/20"
+    vibe: "chaos", // Aligned with chaos to be visible by default
+    status: "unlocked", // Unlocked for the effect
+    date: "LIVE",
+    color: "from-purple-500/20 to-yellow-500/20"
   },
   {
     title: "Naseeha AI",
@@ -184,6 +184,7 @@ export default function HomeHub() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {PROJECTS.map((project, index) => {
             const isLocked = project.status === "locked";
+            const isGenie = project.title === "Palette Genie";
             const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
             return (
@@ -199,6 +200,14 @@ export default function HomeHub() {
                   isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
                 }`}
               >
+                {/* GENIE MAGIC SMOKE HOVER EFFECT */}
+                {!isLocked && isGenie && (
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden">
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-600/30 blur-[60px] rounded-full animate-pulse" />
+                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-500/20 blur-[60px] rounded-full animate-pulse" />
+                  </div>
+                )}
+
                 {isLocked && (
                     <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
                       <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
@@ -209,16 +218,28 @@ export default function HomeHub() {
                   )}
                 <Link href={isLocked ? "#" : project.path} className={`block p-8 h-full ${isLocked ? 'cursor-not-allowed' : ''}`}>
                   <div className="relative z-10">
-                    <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-colors ${!isLocked && 'group-hover:border-orange-500/50'}`}>
+                    <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-all duration-500 ${
+                      !isLocked && (isGenie ? 'group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:text-purple-400' : 'group-hover:border-orange-500/50')
+                    }`}>
                       {project.icon}
                     </div>
-                    <h3 className="text-2xl font-bold mb-3 flex items-center gap-2">
+                    <h3 className={`text-2xl font-bold mb-3 flex items-center gap-2 transition-all duration-500 ${
+                      !isLocked && isGenie && 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-yellow-500'
+                    }`}>
                       {project.title} 
-                      {!isLocked && <ArrowRight size={18} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-orange-500" />}
+                      {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${isGenie ? 'text-yellow-500' : 'text-orange-500'}`} />}
                     </h3>
                     <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
                       {project.desc}
                     </p>
+
+                    {/* SUMMON INDICATOR FOR GENIE */}
+                    {!isLocked && isGenie && (
+                      <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-2 group-hover:translate-y-0">
+                        <Wand2 size={14} className="text-yellow-500 animate-pulse" />
+                        <span className="text-[9px] font-black tracking-[0.3em] uppercase text-yellow-500/80">Rub the Lamp</span>
+                      </div>
+                    )}
                   </div>
                 </Link>
               </motion.div>
