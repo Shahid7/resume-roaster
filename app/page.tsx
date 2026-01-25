@@ -55,7 +55,7 @@ const PROJECTS = [
     path: "/naseeha",
     icon: <Sparkles />,
     vibe: "peace",
-    status: "locked",
+    status: "unlocked",
     date: "JAN 25",
     color: "from-emerald-500/20 to-teal-500/20"
   },
@@ -182,69 +182,94 @@ export default function HomeHub() {
 
         {/* 3. THE 30-DAY GRID */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PROJECTS.map((project, index) => {
-            const isLocked = project.status === "locked";
-            const isGenie = project.title === "Palette Genie";
-            const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
+        {PROJECTS.map((project, index) => {
+  const isLocked = project.status === "locked";
+  const isGenie = project.title === "Palette Genie";
+  const isNaseeha = project.title === "Naseeha AI"; // New detection
+  const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: isHidden ? 0.1 : 1,
-                  scale: isHidden ? 0.95 : 1,
-                  filter: isHidden ? "grayscale(100%)" : "grayscale(0%)"
-                }}
-                className={`relative group rounded-3xl border transition-all duration-500 overflow-hidden ${
-                  isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
-                }`}
-              >
-                {/* GENIE MAGIC SMOKE HOVER EFFECT */}
-                {!isLocked && isGenie && (
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden">
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-600/30 blur-[60px] rounded-full animate-pulse" />
-                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-500/20 blur-[60px] rounded-full animate-pulse" />
-                  </div>
-                )}
+  return (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ 
+        opacity: isHidden ? 0.1 : 1,
+        scale: isHidden ? 0.95 : 1,
+        filter: isHidden ? "grayscale(100%)" : "grayscale(0%)"
+      }}
+      className={`relative group rounded-3xl border transition-all duration-500 overflow-hidden ${
+        isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
+      }`}
+    >
+      {/* 1. GENIE MAGIC SMOKE (Existing) */}
+      {!isLocked && isGenie && (
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-600/30 blur-[60px] rounded-full animate-pulse" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-500/20 blur-[60px] rounded-full animate-pulse" />
+        </div>
+      )}
 
-                {isLocked && (
-                    <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
-                      <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
-                        <Lock size={12} className="text-zinc-600" />
-                      </div>
-                      <span className="text-[7px] font-bold text-zinc-600 tracking-widest">{project.date}</span>
-                    </div>
-                  )}
-                <Link href={isLocked ? "#" : project.path} className={`block p-8 h-full ${isLocked ? 'cursor-not-allowed' : ''}`}>
-                  <div className="relative z-10">
-                    <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-all duration-500 ${
-                      !isLocked && (isGenie ? 'group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:text-purple-400' : 'group-hover:border-orange-500/50')
-                    }`}>
-                      {project.icon}
-                    </div>
-                    <h3 className={`text-2xl font-bold mb-3 flex items-center gap-2 transition-all duration-500 ${
-                      !isLocked && isGenie && 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-yellow-500'
-                    }`}>
-                      {project.title} 
-                      {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${isGenie ? 'text-yellow-500' : 'text-orange-500'}`} />}
-                    </h3>
-                    <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
-                      {project.desc}
-                    </p>
+      {/* 2. NASEEHA PEACE AURA (New) */}
+      {!isLocked && isNaseeha && (
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-[1500ms] pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full" />
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity }}
+            className="absolute -bottom-20 -right-20 w-60 h-60 bg-teal-500/10 blur-[80px] rounded-full" 
+          />
+        </div>
+      )}
 
-                    {/* SUMMON INDICATOR FOR GENIE */}
-                    {!isLocked && isGenie && (
-                      <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-2 group-hover:translate-y-0">
-                        <Wand2 size={14} className="text-yellow-500 animate-pulse" />
-                        <span className="text-[9px] font-black tracking-[0.3em] uppercase text-yellow-500/80">Rub the Lamp</span>
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+      {isLocked && (
+          <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
+            <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
+              <Lock size={12} className="text-zinc-600" />
+            </div>
+            <span className="text-[7px] font-bold text-zinc-600 tracking-widest">{project.date}</span>
+          </div>
+        )}
+
+      <Link href={isLocked ? "#" : project.path} className={`block p-8 h-full ${isLocked ? 'cursor-not-allowed' : ''}`}>
+        <div className="relative z-10">
+          <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-all duration-500 ${
+            !isLocked && (
+              isGenie ? 'group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:text-purple-400' : 
+              isNaseeha ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
+              'group-hover:border-orange-500/50'
+            )
+          }`}>
+            {project.icon}
+          </div>
+          
+          <h3 className={`text-2xl font-bold mb-3 flex items-center gap-2 transition-all duration-500 ${
+            !isLocked && (
+              isGenie ? 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-yellow-500' :
+              isNaseeha ? 'group-hover:text-emerald-400' : ''
+            )
+          }`}>
+            {project.title} 
+            {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
+              isGenie ? 'text-yellow-500' : isNaseeha ? 'text-emerald-500' : 'text-orange-500'
+            }`} />}
+          </h3>
+
+          <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
+            {project.desc}
+          </p>
+
+          {/* 3. NASEEHA "SEEK" INDICATOR */}
+          {!isLocked && isNaseeha && (
+            <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-1000 translate-y-2 group-hover:translate-y-0">
+              <Sparkles size={14} className="text-emerald-500 animate-pulse" />
+              <span className="text-[9px] font-black tracking-[0.3em] uppercase text-emerald-500/80">Breath in...</span>
+            </div>
+          )}
+        </div>
+      </Link>
+    </motion.div>
+  );
+})}
         </div>
 
         {/* 4. FOOTER WITH SCRAMBLE NAME + SECRET TRIGGER */}
