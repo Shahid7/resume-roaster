@@ -12,6 +12,28 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@keyframes inkFlow {
+  0% { 
+    filter: blur(12px); 
+    opacity: 0; 
+    transform: translateY(10px) scale(0.98); 
+  }
+  100% { 
+    filter: blur(0px); 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+.animate-ink {
+  animation: inkFlow 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Optional: Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
