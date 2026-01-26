@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2 } from 'lucide-react';
+import { Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
 
 // 1. SCRAMBLE COMPONENT
 const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number }) => {
@@ -59,13 +59,23 @@ const PROJECTS = [
     date: "JAN 25",
     color: "from-emerald-500/20 to-teal-500/20"
   },
-  ...Array.from({ length: 27 }).map((_, i) => {
-    const dayNumber = 26 + i; // Start from Jan 24
+  {
+    title: "Verse Voyager",
+    desc: "Ancient wisdom unrolled. Seek Quranic verses for the soul.",
+    path: "/voyager",
+    icon: <ScrollText />, // Ensure ScrollText is imported from lucide-react
+    vibe: "peace",
+    status: "unlocked",
+    date: "LIVE",
+    color: "from-yellow-600/20 to-amber-900/20"
+  },
+  ...Array.from({ length: 26 }).map((_, i) => {
+    const dayNumber = 27 + i; // Start from Jan 24
     const isFeb = dayNumber > 31;
     const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
     
     return {
-      title: `Project ${i + 4}`,
+      title: `Project ${i + 5}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -186,6 +196,7 @@ export default function HomeHub() {
   const isLocked = project.status === "locked";
   const isGenie = project.title === "Palette Genie";
   const isNaseeha = project.title === "Naseeha AI"; // New detection
+  const isVoyager = project.title === "Verse Voyager"; // Add this line
   const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
   return (
@@ -221,6 +232,19 @@ export default function HomeHub() {
         </div>
       )}
 
+      {/* 3. VOYAGER GOLD MANUSCRIPT AURA */}
+{!isLocked && isVoyager && (
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-10" />
+    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#d4af37]/10 to-transparent" />
+    <motion.div 
+      animate={{ opacity: [0.2, 0.4, 0.2], y: [0, -10, 0] }}
+      transition={{ duration: 5, repeat: Infinity }}
+      className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#d4af37]/20 to-transparent" 
+    />
+  </div>
+)}
+
       {isLocked && (
           <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
             <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
@@ -236,6 +260,7 @@ export default function HomeHub() {
             !isLocked && (
               isGenie ? 'group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:text-purple-400' : 
               isNaseeha ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
+              isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : // Add this
               'group-hover:border-orange-500/50'
             )
           }`}>
@@ -245,7 +270,8 @@ export default function HomeHub() {
           <h3 className={`text-2xl font-bold mb-3 flex items-center gap-2 transition-all duration-500 ${
             !isLocked && (
               isGenie ? 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-yellow-500' :
-              isNaseeha ? 'group-hover:text-emerald-400' : ''
+              isNaseeha ? 'group-hover:text-emerald-400' :
+              isVoyager ? 'group-hover:text-[#f4e4bc]' : '' // Add this ''
             )
           }`}>
             {project.title} 
@@ -265,6 +291,14 @@ export default function HomeHub() {
               <span className="text-[9px] font-black tracking-[0.3em] uppercase text-emerald-500/80">Breath in...</span>
             </div>
           )}
+
+          {/* 4. VOYAGER "UNROLL" INDICATOR */}
+{!isLocked && isVoyager && (
+  <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-2 group-hover:translate-y-0">
+    <div className="h-[1px] w-8 bg-[#d4af37]/50 animate-pulse" />
+    <span className="text-[9px] font-black tracking-[0.3em] uppercase text-[#d4af37]">Unroll Scroll</span>
+  </div>
+)}
         </div>
       </Link>
     </motion.div>
