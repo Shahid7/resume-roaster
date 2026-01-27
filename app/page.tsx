@@ -215,13 +215,8 @@ export default function HomeHub() {
   const isLocked = project.status === "locked";
   const isGenie = project.title === "Palette Genie";
   const isNaseeha = project.title === "Naseeha AI"; // New detection
-<<<<<<< HEAD
-  const isVoyager = project.title === "Verse Voyager";
-  const isBasirah = project.title === "Basirah Vision"; 
-=======
   const isVoyager = project.title === "Verse Voyager"; // Add this line
   const isBasirah = project.title === "Basirah Vision"; // Add this
->>>>>>> develop
   const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
   return (
