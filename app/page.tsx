@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
+import { Camera, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
 
 // 1. SCRAMBLE COMPONENT
 const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number }) => {
@@ -69,13 +69,23 @@ const PROJECTS = [
     date: "LIVE",
     color: "from-yellow-600/20 to-amber-900/20"
   },
-  ...Array.from({ length: 26 }).map((_, i) => {
-    const dayNumber = 27 + i; // Start from Jan 24
+  {
+    title: "Basirah Vision",
+    desc: "Neural-linked optical analysis. See the world through the AI eye.",
+    path: "/basirah",
+    icon: <Camera />, // Ensure Camera is imported from lucide-react
+    vibe: "peace",
+    status: "unlocked",
+    date: "JAN 27",
+    color: "from-cyan-500/20 to-blue-500/20"
+  },
+  ...Array.from({ length: 25 }).map((_, i) => {
+    const dayNumber = 28 + i;
     const isFeb = dayNumber > 31;
     const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
     
     return {
-      title: `Project ${i + 5}`,
+      title: `Project ${i + 6}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -197,6 +207,7 @@ export default function HomeHub() {
   const isGenie = project.title === "Palette Genie";
   const isNaseeha = project.title === "Naseeha AI"; // New detection
   const isVoyager = project.title === "Verse Voyager"; // Add this line
+  const isBasirah = project.title === "Basirah Vision"; // Add this
   const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
   return (
@@ -245,6 +256,21 @@ export default function HomeHub() {
   </div>
 )}
 
+{/* 4. BASIRAH TACTICAL HUD AURA */}
+{!isLocked && isBasirah && (
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
+    {/* The Scanning Line */}
+    <motion.div 
+      animate={{ top: ["0%", "100%", "0%"] }}
+      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+      className="absolute left-0 right-0 h-[1px] bg-cyan-500 shadow-[0_0_15px_#06b6d4] z-20"
+    />
+    {/* Corner Brackets */}
+    <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-cyan-500/50" />
+    <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-cyan-500/50" />
+  </div>
+)}
+
       {isLocked && (
           <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
             <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
@@ -258,9 +284,9 @@ export default function HomeHub() {
         <div className="relative z-10">
           <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-all duration-500 ${
             !isLocked && (
-              isGenie ? 'group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:text-purple-400' : 
               isNaseeha ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
-              isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : // Add this
+              isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : 
+              isBasirah ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' : // Add this
               'group-hover:border-orange-500/50'
             )
           }`}>
