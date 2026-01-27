@@ -78,6 +78,16 @@ const PROJECTS = [
     date: "JAN 27",
     color: "from-cyan-500/20 to-blue-500/20"
   },
+  {
+    title: "Basirah Vision",
+    desc: "Neural-linked optical analysis. See the world through the AI eye.",
+    path: "/basirah",
+    icon: <Camera />, // Ensure Camera is imported from lucide-react
+    vibe: "peace",
+    status: "unlocked",
+    date: "JAN 27",
+    color: "from-cyan-500/20 to-blue-500/20"
+  },
   ...Array.from({ length: 25 }).map((_, i) => {
     const dayNumber = 28 + i;
     const isFeb = dayNumber > 31;
@@ -205,8 +215,13 @@ export default function HomeHub() {
   const isLocked = project.status === "locked";
   const isGenie = project.title === "Palette Genie";
   const isNaseeha = project.title === "Naseeha AI"; // New detection
+<<<<<<< HEAD
   const isVoyager = project.title === "Verse Voyager";
   const isBasirah = project.title === "Basirah Vision"; 
+=======
+  const isVoyager = project.title === "Verse Voyager"; // Add this line
+  const isBasirah = project.title === "Basirah Vision"; // Add this
+>>>>>>> develop
   const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
   return (
@@ -283,9 +298,9 @@ export default function HomeHub() {
         <div className="relative z-10">
           <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-all duration-500 ${
             !isLocked && (
-              isGenie ? 'group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:text-purple-400' : 
               isNaseeha ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
-              isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : // Add this
+              isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : 
+              isBasirah ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' : // Add this
               'group-hover:border-orange-500/50'
             )
           }`}>
