@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Camera, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
+import { Camera, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
 
 // 1. SCRAMBLE COMPONENT
 const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number }) => {
@@ -78,13 +78,23 @@ const PROJECTS = [
     date: "JAN 27",
     color: "from-cyan-500/20 to-blue-500/20"
   },
-  ...Array.from({ length: 25 }).map((_, i) => {
-    const dayNumber = 28 + i;
+  {
+    title: "Aura Strategy",
+    desc: "Neural momentum strategist. Tiered daily execution protocols.",
+    path: "/aura",
+    icon: <Zap />, 
+    vibe: "momentum", // New vibe category or use 'peace'
+    status: "unlocked",
+    date: "JAN 28",
+    color: "from-purple-600/20 to-indigo-900/20"
+  },
+  ...Array.from({ length: 24 }).map((_, i) => {
+    const dayNumber = 29 + i;
     const isFeb = dayNumber > 31;
     const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
     
     return {
-      title: `Project ${i + 6}`,
+      title: `Project ${i + 7}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -205,8 +215,9 @@ export default function HomeHub() {
   const isLocked = project.status === "locked";
   const isGenie = project.title === "Palette Genie";
   const isNaseeha = project.title === "Naseeha AI"; // New detection
-  const isVoyager = project.title === "Verse Voyager"; // Add this line
-  const isBasirah = project.title === "Basirah Vision"; // Add this
+  const isVoyager = project.title === "Verse Voyager"; 
+  const isBasirah = project.title === "Basirah Vision"; 
+  const isAura = project.title === "Aura Strategy";
   const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
   return (
@@ -270,6 +281,23 @@ export default function HomeHub() {
   </div>
 )}
 
+{/* 6. AURA MOMENTUM PULSE */}
+{!isLocked && isAura && (
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+    {/* Central Pulsing Glow */}
+    <motion.div 
+      animate={{ 
+        scale: [1, 1.2, 1],
+        opacity: [0.1, 0.3, 0.1] 
+      }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      className="absolute inset-0 bg-purple-500/20 blur-[60px] rounded-full"
+    />
+    {/* Floating Particles (Optional for extra flair) */}
+    <div className="absolute bottom-4 left-6 w-1 h-1 bg-indigo-400 rounded-full animate-bounce delay-700" />
+  </div>
+)}
+
       {isLocked && (
           <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
             <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
@@ -285,7 +313,8 @@ export default function HomeHub() {
             !isLocked && (
               isNaseeha ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
               isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : 
-              isBasirah ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' : // Add this
+              isBasirah ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' : 
+              isAura ? 'group-hover:bg-purple-500/10 group-hover:border-purple-500/50 group-hover:text-purple-400' :
               'group-hover:border-orange-500/50'
             )
           }`}>
@@ -296,7 +325,9 @@ export default function HomeHub() {
             !isLocked && (
               isGenie ? 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-yellow-500' :
               isNaseeha ? 'group-hover:text-emerald-400' :
-              isVoyager ? 'group-hover:text-[#f4e4bc]' : '' // Add this ''
+              isVoyager ? 'group-hover:text-[#f4e4bc]' :
+              isBasirah ? 'group-hover:text-cyan-400' :
+              isAura ? 'group-hover:text-purple-300' : '' 
             )
           }`}>
             {project.title} 
