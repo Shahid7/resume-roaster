@@ -1,5 +1,4 @@
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
-
+import * as pdfjsLib from 'pdfjs-dist';
 // Use a dynamic import for the worker from the local package
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/legacy/build/pdf.worker.min.mjs',
