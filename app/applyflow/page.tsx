@@ -72,7 +72,7 @@ export default function ApplyFlow() {
 
         {!result && !loading && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl font-black tracking-tighter mb-2 italic text-zinc-900">QUBUL<span className="text-blue-600">.</span></h1>
+            <h1 className="text-4xl font-black tracking-tighter mb-2 italic text-zinc-900">Apply<span className="text-blue-600">Flow</span></h1>
             <p className="text-zinc-500 mb-10 text-sm">Align your profile with the recruiter's secret checklist.</p>
             
             <div className="grid md:grid-cols-2 gap-8">
