@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Camera, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
+import { Camera, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
 
 // 1. SCRAMBLE COMPONENT
 const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number }) => {
@@ -75,7 +75,7 @@ const PROJECTS = [
     icon: <Camera />, // Ensure Camera is imported from lucide-react
     vibe: "peace",
     status: "unlocked",
-    date: "JAN 27",
+    date: "LIVE",
     color: "from-cyan-500/20 to-blue-500/20"
   },
   {
@@ -85,16 +85,26 @@ const PROJECTS = [
     icon: <Zap />, 
     vibe: "momentum", // New vibe category or use 'peace'
     status: "unlocked",
-    date: "JAN 28",
+    date: "LIVE",
     color: "from-purple-600/20 to-indigo-900/20"
   },
-  ...Array.from({ length: 24 }).map((_, i) => {
-    const dayNumber = 29 + i;
+  {
+    title: "ApplyFlow",
+    desc: "ATS Optimizer & Interview Intelligence. Get through the filters.",
+    path: "/applyflow",
+    icon: <Briefcase />, // Make sure to import Briefcase from lucide-react
+    vibe: "chaos", // Or create a new 'professional' vibe
+    status: "unlocked",
+    date: "JAN 29",
+    color: "from-blue-600/20 to-indigo-900/20"
+  },
+  ...Array.from({ length: 23 }).map((_, i) => {
+    const dayNumber = 30 + i;
     const isFeb = dayNumber > 31;
     const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
     
     return {
-      title: `Project ${i + 7}`,
+      title: `Project ${i + 8}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -218,6 +228,7 @@ export default function HomeHub() {
   const isVoyager = project.title === "Verse Voyager"; 
   const isBasirah = project.title === "Basirah Vision"; 
   const isAura = project.title === "Aura Strategy";
+  const isApplyFlow = project.title === "ApplyFlow";
   const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
   return (
@@ -298,6 +309,29 @@ export default function HomeHub() {
   </div>
 )}
 
+{/* 7. APPLYFLOW SCAN & DATA AURA */}
+{!isLocked && isApplyFlow && (
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
+    {/* Moving Scanline */}
+    <motion.div 
+      animate={{ translateY: ["-100%", "200%"] }}
+      transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+      className="absolute inset-x-0 h-20 bg-gradient-to-b from-transparent via-blue-500/10 to-transparent z-10"
+    />
+    {/* Blue Glow Background */}
+    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-600/20 blur-[60px] rounded-full" />
+    
+    {/* Micro-Data Bits */}
+    <motion.div 
+      animate={{ opacity: [0, 1, 0] }}
+      transition={{ duration: 1.5, repeat: Infinity }}
+      className="absolute top-4 right-10 text-[8px] font-mono text-blue-500/40"
+    >
+      ATS_READY
+    </motion.div>
+  </div>
+)}
+
       {isLocked && (
           <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
             <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
@@ -315,6 +349,7 @@ export default function HomeHub() {
               isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : 
               isBasirah ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' : 
               isAura ? 'group-hover:bg-purple-500/10 group-hover:border-purple-500/50 group-hover:text-purple-400' :
+              isApplyFlow ? 'group-hover:bg-blue-500/10 group-hover:border-blue-500/50 group-hover:text-blue-400' :
               'group-hover:border-orange-500/50'
             )
           }`}>
@@ -327,12 +362,13 @@ export default function HomeHub() {
               isNaseeha ? 'group-hover:text-emerald-400' :
               isVoyager ? 'group-hover:text-[#f4e4bc]' :
               isBasirah ? 'group-hover:text-cyan-400' :
-              isAura ? 'group-hover:text-purple-300' : '' 
+              isAura ? 'group-hover:text-purple-300' : 
+              isApplyFlow ? 'group-hover:text-blue-400' : '' 
             )
           }`}>
             {project.title} 
             {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
-              isGenie ? 'text-yellow-500' : isNaseeha ? 'text-emerald-500' : 'text-orange-500'
+              isGenie ? 'text-yellow-500' : isApplyFlow ? 'text-blue-500' : isNaseeha ? 'text-emerald-500' : 'text-orange-500' 
             }`} />}
           </h3>
 
