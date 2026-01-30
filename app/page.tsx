@@ -2,7 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Camera, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
+// ADDED Database TO IMPORTS
+import { Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
+import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
 const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number }) => {
@@ -27,7 +29,7 @@ const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number
   return <span className="font-mono">{displayText}</span>;
 };
 
-// 2. PROJECT DATA (30 DAYS)
+// 2. PROJECT DATA (REPLACE THE START OF ARRAY)
 const PROJECTS = [
   {
     title: "Resume Roaster",
@@ -44,8 +46,8 @@ const PROJECTS = [
     desc: "Neural-linked harmonies. (Careful, the lamp is hot...)",
     path: "/palette",
     icon: <Palette />,
-    vibe: "chaos", // Aligned with chaos to be visible by default
-    status: "unlocked", // Unlocked for the effect
+    vibe: "chaos",
+    status: "unlocked",
     date: "LIVE",
     color: "from-purple-500/20 to-yellow-500/20"
   },
@@ -63,7 +65,7 @@ const PROJECTS = [
     title: "Verse Voyager",
     desc: "Ancient wisdom unrolled. Seek Quranic verses for the soul.",
     path: "/voyager",
-    icon: <ScrollText />, // Ensure ScrollText is imported from lucide-react
+    icon: <ScrollText />,
     vibe: "peace",
     status: "unlocked",
     date: "LIVE",
@@ -72,7 +74,7 @@ const PROJECTS = [
     title: "Basirah Vision",
     desc: "Neural-linked optical analysis. See the world through the AI eye.",
     path: "/basirah",
-    icon: <Camera />, // Ensure Camera is imported from lucide-react
+    icon: <Camera />,
     vibe: "peace",
     status: "unlocked",
     date: "LIVE",
@@ -83,7 +85,7 @@ const PROJECTS = [
     desc: "Neural momentum strategist. Tiered daily execution protocols.",
     path: "/aura",
     icon: <Zap />, 
-    vibe: "momentum", // New vibe category or use 'peace'
+    vibe: "momentum",
     status: "unlocked",
     date: "LIVE",
     color: "from-purple-600/20 to-indigo-900/20"
@@ -92,19 +94,29 @@ const PROJECTS = [
     title: "ApplyFlow",
     desc: "ATS Optimizer & Interview Intelligence. Get through the filters.",
     path: "/applyflow",
-    icon: <Briefcase />, // Make sure to import Briefcase from lucide-react
-    vibe: "chaos", // Or create a new 'professional' vibe
+    icon: <Briefcase />,
+    vibe: "chaos",
     status: "unlocked",
     date: "JAN 29",
     color: "from-blue-600/20 to-indigo-900/20"
   },
-  ...Array.from({ length: 23 }).map((_, i) => {
-    const dayNumber = 30 + i;
+  {
+    title: "Hunter's Ledger",
+    desc: "Smart Career CRM. AI lead extraction & outreach automation.",
+    path: "/ledger",
+    icon: <Database />,
+    vibe: "chaos",
+    status: "unlocked",
+    date: "JAN 30",
+    color: "from-emerald-600/20 to-zinc-900/20"
+  },
+  ...Array.from({ length: 22 }).map((_, i) => {
+    const dayNumber = 31 + i;
     const isFeb = dayNumber > 31;
     const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
     
     return {
-      title: `Project ${i + 8}`,
+      title: `Project ${i + 9}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -119,8 +131,6 @@ const PROJECTS = [
 export default function HomeHub() {
   const [vibe, setVibe] = useState<'chaos' | 'peace'>('chaos');
   const [scrambleName, setScrambleName] = useState("Shahid Ali Sethi");
-  
-  // SECRET GLITCH LOGIC
   const [glitch, setGlitch] = useState(false);
   const clickCount = useRef(0);
 
@@ -145,9 +155,8 @@ export default function HomeHub() {
       setTimeout(() => {
         setGlitch(false);
         clickCount.current = 0;
-      }, 1500); // Glitch duration
+      }, 1500);
     }
-    // Reset counter if user stops clicking for 2 seconds
     setTimeout(() => { if(!glitch) clickCount.current = 0; }, 2000);
   };
 
@@ -219,193 +228,103 @@ export default function HomeHub() {
           </p>
         </header>
 
+        {/* <ActivityTicker /> */}
+        
         {/* 3. THE 30-DAY GRID */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {PROJECTS.map((project, index) => {
-  const isLocked = project.status === "locked";
-  const isGenie = project.title === "Palette Genie";
-  const isNaseeha = project.title === "Naseeha AI"; // New detection
-  const isVoyager = project.title === "Verse Voyager"; 
-  const isBasirah = project.title === "Basirah Vision"; 
-  const isAura = project.title === "Aura Strategy";
-  const isApplyFlow = project.title === "ApplyFlow";
-  const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
+          const isLocked = project.status === "locked";
+          const isGenie = project.title === "Palette Genie";
+          const isNaseeha = project.title === "Naseeha AI";
+          const isVoyager = project.title === "Verse Voyager"; 
+          const isBasirah = project.title === "Basirah Vision"; 
+          const isAura = project.title === "Aura Strategy";
+          const isApplyFlow = project.title === "ApplyFlow";
+          const isLedger = project.title === "Hunter's Ledger"; // NEW
+          const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
-  return (
-    <motion.div
-      key={index}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ 
-        opacity: isHidden ? 0.1 : 1,
-        scale: isHidden ? 0.95 : 1,
-        filter: isHidden ? "grayscale(100%)" : "grayscale(0%)"
-      }}
-      className={`relative group rounded-3xl border transition-all duration-500 overflow-hidden ${
-        isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
-      }`}
-    >
-      {/* 1. GENIE MAGIC SMOKE (Existing) */}
-      {!isLocked && isGenie && (
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-600/30 blur-[60px] rounded-full animate-pulse" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-500/20 blur-[60px] rounded-full animate-pulse" />
-        </div>
-      )}
+          return (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ 
+                opacity: isHidden ? 0.1 : 1,
+                scale: isHidden ? 0.95 : 1,
+                filter: isHidden ? "grayscale(100%)" : "grayscale(0%)"
+              }}
+              className={`relative group rounded-3xl border transition-all duration-500 overflow-hidden ${
+                isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
+              }`}
+            >
+              {/* LEDGER DATA FLOW AURA (NEW) */}
+              {!isLocked && isLedger && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[50px] rounded-full" />
+                  <motion.div 
+                    animate={{ y: [0, 40], opacity: [0, 1, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute top-10 left-10 text-[8px] font-mono text-emerald-500/40 rotate-90"
+                  >
+                    SQL_STREAM_ACTIVE
+                  </motion.div>
+                </div>
+              )}
 
-      {/* 2. NASEEHA PEACE AURA (New) */}
-      {!isLocked && isNaseeha && (
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-[1500ms] pointer-events-none overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full" />
-          <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="absolute -bottom-20 -right-20 w-60 h-60 bg-teal-500/10 blur-[80px] rounded-full" 
-          />
-        </div>
-      )}
+              {/* ... Rest of your existing Auras (ApplyFlow, Aura, Basirah, etc.) ... */}
+              {!isLocked && isApplyFlow && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
+                  <motion.div animate={{ translateY: ["-100%", "200%"] }} transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }} className="absolute inset-x-0 h-20 bg-gradient-to-b from-transparent via-blue-500/10 to-transparent z-10" />
+                </div>
+              )}
 
-      {/* 3. VOYAGER GOLD MANUSCRIPT AURA */}
-{!isLocked && isVoyager && (
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none overflow-hidden">
-    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-10" />
-    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#d4af37]/10 to-transparent" />
-    <motion.div 
-      animate={{ opacity: [0.2, 0.4, 0.2], y: [0, -10, 0] }}
-      transition={{ duration: 5, repeat: Infinity }}
-      className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#d4af37]/20 to-transparent" 
-    />
-  </div>
-)}
+              {isLocked && (
+                  <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
+                    <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
+                      <Lock size={12} className="text-zinc-600" />
+                    </div>
+                    <span className="text-[7px] font-bold text-zinc-600 tracking-widest">{project.date}</span>
+                  </div>
+                )}
 
-{/* 4. BASIRAH TACTICAL HUD AURA */}
-{!isLocked && isBasirah && (
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
-    {/* The Scanning Line */}
-    <motion.div 
-      animate={{ top: ["0%", "100%", "0%"] }}
-      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-      className="absolute left-0 right-0 h-[1px] bg-cyan-500 shadow-[0_0_15px_#06b6d4] z-20"
-    />
-    {/* Corner Brackets */}
-    <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-cyan-500/50" />
-    <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-cyan-500/50" />
-  </div>
-)}
+              <Link href={isLocked ? "#" : project.path} className={`block p-8 h-full ${isLocked ? 'cursor-not-allowed' : ''}`}>
+                <div className="relative z-10">
+                  <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-all duration-500 ${
+                    !isLocked && (
+                      isLedger ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
+                      isApplyFlow ? 'group-hover:bg-blue-500/10 group-hover:border-blue-500/50 group-hover:text-blue-400' :
+                      'group-hover:border-orange-500/50'
+                    )
+                  }`}>
+                    {project.icon}
+                  </div>
+                  
+                  <h3 className={`text-2xl font-bold mb-3 flex items-center gap-2 transition-all duration-500 ${
+                    !isLocked && (
+                      isLedger ? 'group-hover:text-emerald-400' :
+                      isApplyFlow ? 'group-hover:text-blue-400' : '' 
+                    )
+                  }`}>
+                    {project.title} 
+                    {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
+                      isLedger ? 'text-emerald-500' : 'text-orange-500' 
+                    }`} />}
+                  </h3>
 
-{/* 6. AURA MOMENTUM PULSE */}
-{!isLocked && isAura && (
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-    {/* Central Pulsing Glow */}
-    <motion.div 
-      animate={{ 
-        scale: [1, 1.2, 1],
-        opacity: [0.1, 0.3, 0.1] 
-      }}
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute inset-0 bg-purple-500/20 blur-[60px] rounded-full"
-    />
-    {/* Floating Particles (Optional for extra flair) */}
-    <div className="absolute bottom-4 left-6 w-1 h-1 bg-indigo-400 rounded-full animate-bounce delay-700" />
-  </div>
-)}
-
-{/* 7. APPLYFLOW SCAN & DATA AURA */}
-{!isLocked && isApplyFlow && (
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
-    {/* Moving Scanline */}
-    <motion.div 
-      animate={{ translateY: ["-100%", "200%"] }}
-      transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-      className="absolute inset-x-0 h-20 bg-gradient-to-b from-transparent via-blue-500/10 to-transparent z-10"
-    />
-    {/* Blue Glow Background */}
-    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-600/20 blur-[60px] rounded-full" />
-    
-    {/* Micro-Data Bits */}
-    <motion.div 
-      animate={{ opacity: [0, 1, 0] }}
-      transition={{ duration: 1.5, repeat: Infinity }}
-      className="absolute top-4 right-10 text-[8px] font-mono text-blue-500/40"
-    >
-      ATS_READY
-    </motion.div>
-  </div>
-)}
-
-      {isLocked && (
-          <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
-            <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
-              <Lock size={12} className="text-zinc-600" />
-            </div>
-            <span className="text-[7px] font-bold text-zinc-600 tracking-widest">{project.date}</span>
-          </div>
-        )}
-
-      <Link href={isLocked ? "#" : project.path} className={`block p-8 h-full ${isLocked ? 'cursor-not-allowed' : ''}`}>
-        <div className="relative z-10">
-          <div className={`mb-4 p-3 rounded-xl w-fit border border-zinc-800 bg-zinc-900 transition-all duration-500 ${
-            !isLocked && (
-              isNaseeha ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
-              isVoyager ? 'group-hover:bg-yellow-500/10 group-hover:border-yellow-500/50 group-hover:text-[#d4af37]' : 
-              isBasirah ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' : 
-              isAura ? 'group-hover:bg-purple-500/10 group-hover:border-purple-500/50 group-hover:text-purple-400' :
-              isApplyFlow ? 'group-hover:bg-blue-500/10 group-hover:border-blue-500/50 group-hover:text-blue-400' :
-              'group-hover:border-orange-500/50'
-            )
-          }`}>
-            {project.icon}
-          </div>
-          
-          <h3 className={`text-2xl font-bold mb-3 flex items-center gap-2 transition-all duration-500 ${
-            !isLocked && (
-              isGenie ? 'group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-yellow-500' :
-              isNaseeha ? 'group-hover:text-emerald-400' :
-              isVoyager ? 'group-hover:text-[#f4e4bc]' :
-              isBasirah ? 'group-hover:text-cyan-400' :
-              isAura ? 'group-hover:text-purple-300' : 
-              isApplyFlow ? 'group-hover:text-blue-400' : '' 
-            )
-          }`}>
-            {project.title} 
-            {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
-              isGenie ? 'text-yellow-500' : isApplyFlow ? 'text-blue-500' : isNaseeha ? 'text-emerald-500' : 'text-orange-500' 
-            }`} />}
-          </h3>
-
-          <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
-            {project.desc}
-          </p>
-
-          {/* 3. NASEEHA "SEEK" INDICATOR */}
-          {!isLocked && isNaseeha && (
-            <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-1000 translate-y-2 group-hover:translate-y-0">
-              <Sparkles size={14} className="text-emerald-500 animate-pulse" />
-              <span className="text-[9px] font-black tracking-[0.3em] uppercase text-emerald-500/80">Breath in...</span>
-            </div>
-          )}
-
-          {/* 4. VOYAGER "UNROLL" INDICATOR */}
-{!isLocked && isVoyager && (
-  <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-2 group-hover:translate-y-0">
-    <div className="h-[1px] w-8 bg-[#d4af37]/50 animate-pulse" />
-    <span className="text-[9px] font-black tracking-[0.3em] uppercase text-[#d4af37]">Unroll Scroll</span>
-  </div>
-)}
-        </div>
-      </Link>
-    </motion.div>
-  );
-})}
+                  <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
+                    {project.desc}
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
         </div>
 
-        {/* 4. FOOTER WITH SCRAMBLE NAME + SECRET TRIGGER */}
+        {/* 4. FOOTER */}
         <footer className="mt-32 pt-10 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-zinc-600 text-sm font-mono">
             &copy; {new Date().getFullYear()} — Hand-coded by 
-            <span 
-              onClick={triggerSecret} 
-              className="text-white font-bold cursor-pointer ml-1 hover:text-orange-500 transition-colors"
-            >
+            <span onClick={triggerSecret} className="text-white font-bold cursor-pointer ml-1 hover:text-orange-500 transition-colors">
               <ScrambleText text={scrambleName} />
             </span>
           </div>
