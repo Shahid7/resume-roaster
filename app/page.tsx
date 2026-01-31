@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 // ADDED Database TO IMPORTS
-import { Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
+import { Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
 import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
@@ -109,6 +109,16 @@ const PROJECTS = [
     status: "unlocked",
     date: "JAN 30",
     color: "from-emerald-600/20 to-zinc-900/20"
+  },
+  {
+    title: "Aura Morphos",
+    desc: "Neural identity mirror. Extract the visual frequency of your digital soul.",
+    path: "/morphos",
+    icon: <Fingerprint />, // Make sure to import Fingerprint from 'lucide-react'
+    vibe: "peace",
+    status: "unlocked",
+    date: "LIVE",
+    color: "from-[#bfff00]/20 to-zinc-900/20"
   },
   ...Array.from({ length: 22 }).map((_, i) => {
     const dayNumber = 31 + i;
@@ -240,7 +250,8 @@ export default function HomeHub() {
           const isBasirah = project.title === "Basirah Vision"; 
           const isAura = project.title === "Aura Strategy";
           const isApplyFlow = project.title === "ApplyFlow";
-          const isLedger = project.title === "Hunter's Ledger"; // NEW
+          const isLedger = project.title === "Hunter's Ledger"; 
+          const isMorphos = project.title === "Aura Morphos";
           const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
           return (
@@ -270,6 +281,21 @@ export default function HomeHub() {
                 </div>
               )}
 
+               {/* AURA MORPHOS LIQUID EFFECT (NEW) */}
+              {!isLocked && isMorphos && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden">
+                  <motion.div 
+                    animate={{
+                      scale: [1, 1.5, 1.2, 1.4, 1],
+                      rotate: [0, 90, 180, 270, 360],
+                    }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    className="absolute -top-20 -right-20 w-64 h-64 bg-[#bfff00]/10 blur-[60px] rounded-[40%_60%_70%_30%]"
+                  />
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay" />
+                </div>
+              )}
+
               {/* ... Rest of your existing Auras (ApplyFlow, Aura, Basirah, etc.) ... */}
               {!isLocked && isApplyFlow && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
@@ -292,6 +318,7 @@ export default function HomeHub() {
                     !isLocked && (
                       isLedger ? 'group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400' :
                       isApplyFlow ? 'group-hover:bg-blue-500/10 group-hover:border-blue-500/50 group-hover:text-blue-400' :
+                      isMorphos ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/40 group-hover:text-[#bfff00]' :
                       'group-hover:border-orange-500/50'
                     )
                   }`}>
@@ -301,11 +328,13 @@ export default function HomeHub() {
                   <h3 className={`text-2xl font-bold mb-3 flex items-center gap-2 transition-all duration-500 ${
                     !isLocked && (
                       isLedger ? 'group-hover:text-emerald-400' :
+                      isMorphos ? 'group-hover:text-[#bfff00] font-serif italic' : 
                       isApplyFlow ? 'group-hover:text-blue-400' : '' 
                     )
                   }`}>
                     {project.title} 
                     {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
+                      isMorphos ? 'text-[#bfff00]' :
                       isLedger ? 'text-emerald-500' : 'text-orange-500' 
                     }`} />}
                   </h3>
