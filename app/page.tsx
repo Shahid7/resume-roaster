@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 // ADDED Database TO IMPORTS
-import { Activity, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText } from 'lucide-react';
+import { Activity, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio } from 'lucide-react';
 import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
@@ -131,22 +131,22 @@ const PROJECTS = [
     color: "from-lime-400/20 to-cyan-500/20"
   },
   {
-    title: "Aura Tracker",
-    desc: "Neural-linked momentum forecasting. Predicting your next peak based on current frequency stability.",
-    path: "/aura-tracker", // This would be the new route for the visualizer
-    icon: <Activity />, 
-    vibe: "momentum",
+    title: "Focus-Aura",
+    desc: "Neural-acoustic bio-hacking. Synchronize brainwaves through Brownian frequency loops.",
+    path: "/focus-aura", 
+    icon: <Radio />, 
+    vibe: "peace",
     status: "unlocked",
     date: "DAY 11",
     color: "from-[#bfff00]/20 to-emerald-900/20"
   },
   ...Array.from({ length: 20 }).map((_, i) => {
-    const dayNumber = 34 + i;
+    const dayNumber = 36 + i;
     const isFeb = dayNumber > 31;
     const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
     
     return {
-      title: `Project ${i + 11}`,
+      title: `Project ${i + 12}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -274,6 +274,7 @@ export default function HomeHub() {
           const isLedger = project.title === "Hunter's Ledger"; 
           const isMorphos = project.title === "Aura Morphos";
           const isV10 = project.title === "Vision Alchemist";
+          const isFocusAura = project.title === "Focus-Aura"; // NEW FOR DAY 11
           const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
           return (
@@ -289,6 +290,22 @@ export default function HomeHub() {
                 isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
               }`}
             >
+              {/* FOCUS-AURA FREQUENCY RIPPLE (NEW DAY 11) */}
+              {!isLocked && isFocusAura && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div 
+                      key={i}
+                      animate={{ scale: [1, 2], opacity: [0.3, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: i * 0.6 }}
+                      className="absolute inset-0 border border-[#bfff00]/20 rounded-full"
+                      style={{ transformOrigin: 'center' }}
+                    />
+                  ))}
+                  <div className="absolute bottom-4 left-8 font-mono text-[7px] text-[#bfff00]/30 tracking-widest">HZ_SYNC_ENABLED</div>
+                </div>
+              )}
+
               {/* LEDGER DATA FLOW AURA (NEW) */}
               {!isLocked && isLedger && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
@@ -330,9 +347,6 @@ export default function HomeHub() {
                 </div>
               )}
 
-              
-
-              {/* ... Rest of your existing Auras (ApplyFlow, Aura, Basirah, etc.) ... */}
               {!isLocked && isApplyFlow && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
                   <motion.div animate={{ translateY: ["-100%", "200%"] }} transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }} className="absolute inset-x-0 h-20 bg-gradient-to-b from-transparent via-blue-500/10 to-transparent z-10" />
@@ -356,6 +370,7 @@ export default function HomeHub() {
                       isApplyFlow ? 'group-hover:bg-blue-500/10 group-hover:border-blue-500/50 group-hover:text-blue-400' :
                       isMorphos ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/40 group-hover:text-[#bfff00]' :
                       isV10 ? 'group-hover:border-lime-400 group-hover:text-lime-400' :
+                      isFocusAura ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/50 group-hover:text-[#bfff00]' :
                       'group-hover:border-orange-500/50'
                     )
                   }`}>
@@ -367,12 +382,13 @@ export default function HomeHub() {
                       isLedger ? 'group-hover:text-emerald-400' :
                       isMorphos ? 'group-hover:text-[#bfff00] font-serif italic' : 
                       isV10 ? 'group-hover:text-lime-400' :
+                      isFocusAura ? 'group-hover:text-[#bfff00]' :
                       isApplyFlow ? 'group-hover:text-blue-400' : '' 
                     )
                   }`}>
                     {project.title} 
                     {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
-                      isMorphos ? 'text-[#bfff00]' :
+                      isMorphos || isFocusAura ? 'text-[#bfff00]' :
                       isLedger ? 'text-emerald-500' : 'text-orange-500' 
                     }`} />}
                   </h3>

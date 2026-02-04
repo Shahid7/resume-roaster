@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Target, X, Flame, BarChart3, TrendingUp, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Cpu, Wand2, Brain, Target, X, Flame, BarChart3, TrendingUp, AlertCircle, ShieldCheck } from 'lucide-react';
 import { calculateAuraLocally } from '@/lib/aura-calc';
 
 // --- TYPES ---
@@ -106,6 +106,77 @@ export default function AuraTracker() {
   useEffect(() => {
     if (mounted) localStorage.setItem('aura_goals', JSON.stringify(goals));
   }, [goals, mounted]);
+
+  const ProtocolAdjustment = ({ score, avgAura }: { score: number, avgAura: number }) => {
+    // Logic to determine the "Protocol" based on performance
+    const getProtocol = () => {
+      if (score < 4) return {
+        title: "RECOVERY_PROTOCOL",
+        action: "Neural Reset Required",
+        desc: "Baseline frequency too low. Immediate 15min physical movement and 2L hydration recommended to clear latency.",
+        color: "text-orange-500",
+        bg: "bg-orange-500/10",
+        border: "border-orange-500/20"
+      };
+      if (score >= 4 && score < 8) return {
+        title: "STABILITY_PROTOCOL",
+        action: "Incremental Loading",
+        desc: "System stable but idle. Increase Deep Work blocks by 20% to break out of the maintenance plateau.",
+        color: "text-blue-400",
+        bg: "bg-blue-400/10",
+        border: "border-blue-400/20"
+      };
+      return {
+        title: "APEX_PROTOCOL",
+        action: "High-Frequency Flow",
+        desc: "Maximum stability detected. Lock distractions. Today is a primary build window—do not compromise momentum.",
+        color: "text-[#bfff00]",
+        bg: "bg-[#bfff00]/10",
+        border: "border-[#bfff00]/20"
+      };
+    };
+  
+    const p = getProtocol();
+  
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className={`p-6 rounded-[2rem] border ${p.border} ${p.bg} backdrop-blur-xl relative overflow-hidden`}
+      >
+        {/* Decorative Scanner Line */}
+        <motion.div 
+          animate={{ x: ['-100%', '200%'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className={`absolute top-0 h-[1px] w-20 bg-gradient-to-r from-transparent via-current to-transparent ${p.color}`}
+        />
+  
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <div className={`flex items-center gap-2 mb-1 font-mono text-[9px] font-black uppercase tracking-[0.2em] ${p.color}`}>
+              <Cpu size={12} /> {p.title}
+            </div>
+            <h4 className="text-xl font-black italic uppercase tracking-tighter text-white">
+              {p.action}
+            </h4>
+          </div>
+          <div className={`p-2 rounded-lg bg-black/40 border ${p.border}`}>
+            <Wand2 size={16} className={p.color} />
+          </div>
+        </div>
+  
+        <p className="text-[10px] text-zinc-400 font-medium leading-relaxed uppercase mb-4">
+          {p.desc}
+        </p>
+  
+        <div className="flex gap-2">
+          <button className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all hover:bg-white hover:text-black ${p.border} ${p.color}`}>
+            Accept_Protocol
+          </button>
+        </div>
+      </motion.div>
+    );
+  };
 
   // THE ENGINE: Calculates grid based on History state
   const { gridData, stats, forecast } = useMemo(() => {
