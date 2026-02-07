@@ -39,7 +39,7 @@ export default function ActivityTicker() {
       .channel('realtime-logs')
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'lab_activity' }, 
-        (payload) => {
+        (payload: any) => {
           setLogs((prev) => [payload.new, ...prev].slice(0, 5));
         }
       )

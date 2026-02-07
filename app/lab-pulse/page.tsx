@@ -11,11 +11,10 @@ export default function LabPulse() {
       const { data } = await supabase.from('lab_activity').select('*');
       if (data && data.length > 0) {
         const total = data.length;
-        const avg = data.reduce((acc, curr) => {
-            // Extract number from description if possible
-            const score = curr.description.match(/\d+/);
-            return score ? acc + parseInt(score[0]) : acc;
-        }, 0) / total;
+        const avg = data.reduce((acc: number, curr: any) => {
+          const score = curr.description.match(/\d+/);
+          return score ? acc + parseInt(score[0]) : acc;
+      }, 0); // <--- Added 0 as the starting point / total;
         
         setStats({
           total,
