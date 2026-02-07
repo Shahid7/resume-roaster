@@ -85,7 +85,7 @@ export default function AuraTerminal() {
 
   // 2. EXTENSION HEARTBEAT (Detect Disabling)
   useEffect(() => {
-    const EXTENSION_ID = "ombhpldfkdlnbhlgoflejijbhoiiomff"; // Get this from chrome://extensions
+    // const EXTENSION_ID = "ombhpldfkdlnbhlgoflejijbhoiiomff"; // Get this from chrome://extensions
   
     const checkLink = setInterval(() => {
       if (typeof window !== 'undefined' && (window as any).chrome?.runtime) {
