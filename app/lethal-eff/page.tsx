@@ -85,20 +85,24 @@ export default function AuraTerminal() {
 
   // 2. EXTENSION HEARTBEAT (Detect Disabling)
   useEffect(() => {
-    const checkExtension = setInterval(() => {
-      // Check for common extension global variables or message the extension
-      const isExtensionActive = !!((window as any).chrome && (window as any).chrome.runtime && (window as any).chrome.runtime.id);
-      
-      if (!isExtensionActive && isLinkStable) {
+    const EXTENSION_ID = "ombhpldfkdlnbhlgoflejijbhoiiomff"; // Get this from chrome://extensions
+  
+    const checkLink = setInterval(() => {
+      if (typeof window !== 'undefined' && (window as any).chrome?.runtime) {
+        // Try to send a "Ping" to the extension
+        (window as any).chrome.runtime.sendMessage(EXTENSION_ID, { action: "ping" }, (response: any) => {
+          if ((window as any).chrome.runtime.lastError) {
+            setIsLinkStable(false); // No response = Link Severed
+          } else if (response) {
+            setIsLinkStable(true); // Response = Link Stable
+          }
+        });
+      } else {
         setIsLinkStable(false);
-        setHistory(prev => [...prev, "CRITICAL_ERR: NEURAL_LINK_SEVERED.", "LOGGING_BREACH: Manual_Disconnect_Detected."]);
-        
-        const breaches = JSON.parse(localStorage.getItem('aura_breaches') || "[]");
-        breaches.push(`[${new Date().toLocaleTimeString()}] LINK_DISCONNECT_MANUAL`);
-        localStorage.setItem('aura_breaches', JSON.stringify(breaches));
       }
     }, 5000);
-    return () => clearInterval(checkExtension);
+  
+    return () => clearInterval(checkLink);
   }, [isLinkStable]);
 
   // 3. FOCUS TIMER & SCORE SYNC
