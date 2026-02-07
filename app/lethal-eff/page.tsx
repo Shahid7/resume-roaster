@@ -141,7 +141,11 @@ export default function AuraTerminal() {
     if (cmd === "/help") {
       response = "CMDS: /focus [min], /logs, /status, /clear, /lock [site]";
     } else if (cmd === "/status") {
-      response = `REPORT: Aura_${score.toFixed(1)}/10 | Link_${isLinkStable ? 'ACTIVE' : 'OFFLINE'}`;
+      const freshData = JSON.parse(localStorage.getItem('aura_history') || "{}");
+      const todayKey = new Date().toISOString().split('T')[0];
+      const currentScore = freshData[todayKey] ?? 5.0; // Use ?? to handle 0 scores
+      
+      response = `REPORT: Aura_${Number(currentScore).toFixed(1)}/10 | Link_${isLinkStable ? 'ACTIVE' : 'OFFLINE'}`;
     } else if (cmd === "/logs") {
       const breaches = JSON.parse(localStorage.getItem('aura_breaches') || "[]");
       response = breaches.length > 0 ? `LOGS: ${breaches.slice(-3).join(" | ")}` : "SYSTEM_CLEAN: No breaches.";
