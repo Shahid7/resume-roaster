@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 // ADDED Database TO IMPORTS
-import { Activity, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio } from 'lucide-react';
+import { Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio } from 'lucide-react';
 import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
@@ -150,13 +150,23 @@ const PROJECTS = [
     date: "DAY 12",
     color: "from-[#bfff00]/20 to-zinc-900/20"
   },
-  ...Array.from({ length: 18 }).map((_, i) => {
-    const dayNumber = 38 + i;
+  {
+    title: "Lethal Eff",
+    desc: "Command-line habit OS. Execute protocols, monitor logs, and maintain system discipline via CLI.",
+    path: "/lethal-eff", // or wherever your terminal page lives
+    icon: <Terminal />,
+    vibe: "momentum",
+    status: "unlocked",
+    date: "DAY 13",
+    color: "from-[#bfff00]/20 to-zinc-900/20"
+  },
+  ...Array.from({ length: 17 }).map((_, i) => {
+    const dayNumber = 40 + i;
     const isFeb = dayNumber > 31;
     const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
     
     return {
-      title: `Project ${i + 13}`,
+      title: `Project ${i + 14}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -286,6 +296,7 @@ export default function HomeHub() {
           const isV10 = project.title === "Vision Alchemist";
           const isFocusAura = project.title === "Focus-Aura"; 
           const isAuraGate = project.title === "Aura Gate";
+          const isLethalEff = project.title === "Lethal Eff"
           const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
           return (
@@ -301,7 +312,7 @@ export default function HomeHub() {
                 isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
               }`}
             >
-              {/* FOCUS-AURA FREQUENCY RIPPLE (NEW DAY 11) */}
+              {/* FOCUS-AURA FREQUENCY RIPPLE */}
               {!isLocked && isFocusAura && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                   {[...Array(3)].map((_, i) => (
@@ -344,6 +355,27 @@ export default function HomeHub() {
   </div>
 )}
 
+{/* AURA TERMINAL CLI EFFECT (DAY 13) */}
+{!isLocked && project.title === "Lethal Eff" && (
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden bg-black/40">
+    {/* Terminal Code Rain */}
+    <div className="absolute top-4 left-6 font-mono text-[6px] text-[#bfff00]/40 flex flex-col gap-1">
+      <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.5, repeat: Infinity }}>❯ executing_protocol_v1.3...</motion.span>
+      <span className="text-[#bfff00]/20">❯ aura_score: 9.8</span>
+      <span className="text-[#bfff00]/20">❯ shield_status: active</span>
+      <span className="text-[#bfff00]/20">❯ bypass_detected: false</span>
+      <motion.span 
+        animate={{ opacity: [1, 0] }} 
+        transition={{ duration: 0.8, repeat: Infinity }}
+        className="w-1.5 h-3 bg-[#bfff00] inline-block"
+      />
+    </div>
+    
+    {/* Terminal Scanline */}
+    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%]" />
+  </div>
+)}
+
               {/* LEDGER DATA FLOW AURA */}
               {!isLocked && isLedger && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
@@ -358,7 +390,7 @@ export default function HomeHub() {
                 </div>
               )}
 
-               {/* AURA MORPHOS LIQUID EFFECT (NEW) */}
+               {/* AURA MORPHOS LIQUID EFFECT*/}
               {!isLocked && isMorphos && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden">
                   <motion.div 
@@ -423,6 +455,7 @@ export default function HomeHub() {
                       isV10 ? 'group-hover:text-lime-400' :
                       isFocusAura ? 'group-hover:text-[#bfff00]' :
                       isAuraGate ? 'group-hover:text-[#bfff00] font-black italic' : 
+                      isLethalEff ? 'group-hover:text-[#bfff00] font-mono uppercase tracking-tighter' : 
                       isApplyFlow ? 'group-hover:text-blue-400' : '' 
                     )
                   }`}>
@@ -430,6 +463,7 @@ export default function HomeHub() {
                     {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
                       isMorphos || isFocusAura ? 'text-[#bfff00]' :
                       isAuraGate ? 'text-[#bfff00]' :
+                      isLethalEff ? 'text-[#bfff00]' : 
                       isLedger ? 'text-emerald-500' : 'text-orange-500' 
                     }`} />}
                   </h3>
