@@ -95,8 +95,8 @@ function MisbahaContent() {
       {mode === 'selection' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center space-y-12 max-w-sm w-full">
           <Zap style={{ color: accentColor }} className="mx-auto animate-pulse" size={60} />
-          <div className="space-y-4">
-            <h1 className="text-6xl font-black italic tracking-tighter uppercase leading-none text-white">Misbaha</h1>
+          <div className="space-y-4"> 
+            <h1 className="text-6xl font-black italic tracking-tighter uppercase leading-none text-white">Misbaha.</h1>
             <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Lifetime Pulse: {lifetime}</p>
           </div>
           <button onClick={() => joinSession(Math.random().toString(36).substring(7).toUpperCase(), false)}
