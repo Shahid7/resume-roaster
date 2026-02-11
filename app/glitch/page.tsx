@@ -16,7 +16,7 @@ export default function SonicUltraVault() {
   const [vaultTension, setVaultTension] = useState<number | null>(null);
   const [currentTension, setCurrentTension] = useState(0);
   const [attempts, setAttempts] = useState(0);
-  const [feedbackMsg, setFeedbackMsg] = useState("AUDIO_DRIVER_INITIALIZED...");
+  const [feedbackMsg, setFeedbackMsg] = useState("FREQUENCY_INITIALIZED...");
   const [showRegSuccess, setShowRegSuccess] = useState(false);
 
   const anchor = { x: 400, y: 220 };
@@ -163,7 +163,7 @@ export default function SonicUltraVault() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Volume2 size={18} className="animate-pulse" />
-            <h1 className="text-2xl font-black italic uppercase tracking-tighter text-white">Glitch <span className="text-[#bfff00] text-xs">v.2.0_SONIC</span></h1>
+            <h1 className="text-2xl font-black italic uppercase tracking-tighter text-white">Glitch <span className="text-[#bfff00] text-xs">SONIC</span></h1>
           </div>
           <div className="flex gap-1.5">
             {[...Array(3)].map((_, i) => (
