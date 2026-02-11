@@ -113,7 +113,7 @@ export default function SonicUltraVault() {
 
     Matter.Events.on(mc, 'startdrag', () => startDrone());
 
-    Matter.Events.on(mc, 'enddrag', (e) => {
+    Matter.Events.on(mc, 'enddrag', (e: any) => {
       stopDrone();
       if (e.body === handle) handleReleaseLogic(Matter.Vector.magnitude(Matter.Vector.sub(handle.position, anchor)));
     });
