@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 // ADDED Database TO IMPORTS
-import { HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio } from 'lucide-react';
+import { HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio, Scan } from 'lucide-react';
 import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
@@ -29,7 +29,7 @@ const ScrambleText = ({ text, interval = 30 }: { text: string, interval?: number
   return <span className="font-mono">{displayText}</span>;
 };
 
-// 2. PROJECT DATA (REPLACE THE START OF ARRAY)
+// 2. PROJECT DATA
 const PROJECTS = [
   {
     title: "Resume Roaster",
@@ -114,7 +114,7 @@ const PROJECTS = [
     title: "Aura Morphos",
     desc: "Neural identity mirror. Extract the visual frequency of your digital soul.",
     path: "/morphos",
-    icon: <Fingerprint />, // Make sure to import Fingerprint from 'lucide-react'
+    icon: <Fingerprint />, 
     vibe: "peace",
     status: "unlocked",
     date: "LIVE",
@@ -153,7 +153,7 @@ const PROJECTS = [
   {
     title: "Lethal Eff",
     desc: "Command-line habit OS. Execute protocols, monitor logs, and maintain system discipline via CLI.",
-    path: "/lethal-eff", // or wherever your terminal page lives
+    path: "/lethal-eff", 
     icon: <Terminal />,
     vibe: "momentum",
     status: "unlocked",
@@ -174,7 +174,7 @@ const PROJECTS = [
     title: "Stress Smasher",
     desc: "Kinetic destruction lab. Smash geometry, slow down time, and erase your stress through physics-based chaos.",
     path: "/stress-smasher",
-    icon: <Activity />, // Representing the kinetic energy
+    icon: <Activity />, 
     vibe: "chaos",
     status: "unlocked",
     date: "DAY 15",
@@ -190,13 +190,22 @@ const PROJECTS = [
     date: "DAY 16",
     color: "from-red-600/20 to-zinc-900/20"
   },
-  ...Array.from({ length: 14 }).map((_, i) => {
-    const dayNumber = 43 + i;
-    const isFeb = dayNumber > 31;
-    const displayDate = isFeb ? `${dayNumber - 31} FEB` : `${dayNumber} JAN`;
+  {
+    title: "Onyx Lens",
+    desc: "Hardware-accelerated optical focus engine. Blueprint-sync reading for deep cognitive immersion.",
+    path: "/onyx-lens",
+    icon: <Scan />,
+    vibe: "momentum",
+    status: "unlocked",
+    date: "DAY 17",
+    color: "from-cyan-400/20 to-blue-900/20"
+  },
+  ...Array.from({ length: 13 }).map((_, i) => {
+    const dayNumber = 14 + i;
+    const displayDate = `${dayNumber + 3} FEB`;
     
     return {
-      title: `Project ${i + 17}`,
+      title: `Project ${i + 18}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -206,13 +215,13 @@ const PROJECTS = [
       color: "from-zinc-500/10 to-zinc-800/10"
     };
   })
-  
 ];
 
 export default function HomeHub() {
   const [vibe, setVibe] = useState<'chaos' | 'peace'>('chaos');
   const [scrambleName, setScrambleName] = useState("Shahid Ali Sethi");
   const [glitch, setGlitch] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const clickCount = useRef(0);
 
   const playSound = (url: string, volume = 0.2) => {
@@ -245,7 +254,14 @@ export default function HomeHub() {
     const timer = setInterval(() => {
       setScrambleName("Shahid Ali Sethi"); 
     }, 5000);
-    return () => clearInterval(timer);
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   return (
@@ -309,9 +325,6 @@ export default function HomeHub() {
           </p>
         </header>
 
-        {/* <ActivityTicker /> */}
-        
-        {/* 3. THE 30-DAY GRID */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {PROJECTS.map((project, index) => {
           const isLocked = project.status === "locked";
@@ -330,6 +343,7 @@ export default function HomeHub() {
           const isPulse = project.title === "Pulse";
           const isStressSmasher = project.title === "Stress Smasher";
           const isGlitchAuth = project.title === "Glitch Auth";
+          const isOnyxLens = project.title === "Onyx Lens";
           const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
           return (
@@ -345,6 +359,26 @@ export default function HomeHub() {
                 isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
               }`}
             >
+              {/* ONYX LENS FOCUS EFFECT (DAY 17) */}
+              {!isLocked && isOnyxLens && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
+                  <div className="absolute inset-0 bg-cyan-500/5 backdrop-blur-[2px]" />
+                  <motion.div 
+                    animate={{ 
+                      background: [
+                        'radial-gradient(circle at 50% 50%, transparent 0%, rgba(2,6,23,0.8) 100%)',
+                        'radial-gradient(circle at 60% 40%, transparent 0%, rgba(2,6,23,0.8) 100%)',
+                        'radial-gradient(circle at 40% 60%, transparent 0%, rgba(2,6,23,0.8) 100%)',
+                        'radial-gradient(circle at 50% 50%, transparent 0%, rgba(2,6,23,0.8) 100%)'
+                      ]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="absolute inset-0 z-10"
+                  />
+                  <div className="absolute top-4 right-8 font-mono text-[7px] text-cyan-400 tracking-[0.4em] uppercase">Optic_Sync_Active</div>
+                </div>
+              )}
+
               {/* FOCUS-AURA FREQUENCY RIPPLE */}
               {!isLocked && isFocusAura && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
@@ -362,55 +396,50 @@ export default function HomeHub() {
               )}
 
               {/* AURA-GATE SYSTEM INTEGRITY EFFECT (DAY 12) */}
-{!isLocked && isAuraGate && (
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
-    {/* Scanning Bar */}
-    <motion.div 
-      animate={{ y: ["0%", "400%"] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-      className="absolute inset-x-0 h-[1px] bg-[#bfff00] shadow-[0_0_15px_#bfff00] z-20"
-    />
-    {/* Grid Overlay */}
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(5,5,5,0.8)_100%)] z-10" />
-    <div className="absolute bottom-4 right-6 flex flex-col items-end gap-1">
-      <div className="flex gap-1">
-        {[...Array(4)].map((_, i) => (
-          <motion.div 
-            key={i}
-            animate={{ opacity: [0.2, 1, 0.2] }}
-            transition={{ duration: 1, delay: i * 0.2, repeat: Infinity }}
-            className="w-1 h-3 bg-[#bfff00]"
-          />
-        ))}
-      </div>
-      <span className="font-mono text-[7px] text-[#bfff00] tracking-tighter uppercase">Integrity_Secure</span>
-    </div>
-  </div>
-)}
+              {!isLocked && isAuraGate && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
+                  <motion.div 
+                    animate={{ y: ["0%", "400%"] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-x-0 h-[1px] bg-[#bfff00] shadow-[0_0_15px_#bfff00] z-20"
+                  />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(5,5,5,0.8)_100%)] z-10" />
+                  <div className="absolute bottom-4 right-6 flex flex-col items-end gap-1">
+                    <div className="flex gap-1">
+                      {[...Array(4)].map((_, i) => (
+                        <motion.div 
+                          key={i}
+                          animate={{ opacity: [0.2, 1, 0.2] }}
+                          transition={{ duration: 1, delay: i * 0.2, repeat: Infinity }}
+                          className="w-1 h-3 bg-[#bfff00]"
+                        />
+                      ))}
+                    </div>
+                    <span className="font-mono text-[7px] text-[#bfff00] tracking-tighter uppercase">Integrity_Secure</span>
+                  </div>
+                </div>
+              )}
 
-{/* AURA TERMINAL CLI EFFECT (DAY 13) */}
-{!isLocked && project.title === "Lethal Eff" && (
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden bg-black/40">
-    {/* Terminal Code Rain */}
-    <div className="absolute top-4 left-6 font-mono text-[6px] text-[#bfff00]/40 flex flex-col gap-1">
-      <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.5, repeat: Infinity }}>❯ executing_protocol_v1.3...</motion.span>
-      <span className="text-[#bfff00]/20">❯ aura_score: 9.8</span>
-      <span className="text-[#bfff00]/20">❯ shield_status: active</span>
-      <span className="text-[#bfff00]/20">❯ bypass_detected: false</span>
-      <motion.span 
-        animate={{ opacity: [1, 0] }} 
-        transition={{ duration: 0.8, repeat: Infinity }}
-        className="w-1.5 h-3 bg-[#bfff00] inline-block"
-      />
-    </div>
-    
-    {/* Terminal Scanline */}
-    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%]" />
-  </div>
-)}
+              {/* AURA TERMINAL CLI EFFECT (DAY 13) */}
+              {!isLocked && project.title === "Lethal Eff" && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden bg-black/40">
+                  <div className="absolute top-4 left-6 font-mono text-[6px] text-[#bfff00]/40 flex flex-col gap-1">
+                    <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.5, repeat: Infinity }}>❯ executing_protocol_v1.3...</motion.span>
+                    <span className="text-[#bfff00]/20">❯ aura_score: 9.8</span>
+                    <span className="text-[#bfff00]/20">❯ shield_status: active</span>
+                    <span className="text-[#bfff00]/20">❯ bypass_detected: false</span>
+                    <motion.span 
+                      animate={{ opacity: [1, 0] }} 
+                      transition={{ duration: 0.8, repeat: Infinity }}
+                      className="w-1.5 h-3 bg-[#bfff00] inline-block"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%]" />
+                </div>
+              )}
 
-{/* AURA-PULSE HEARTBEAT EFFECT (DAY 14) */}
-{!isLocked && isPulse && (
+              {/* AURA-PULSE HEARTBEAT EFFECT (DAY 14) */}
+              {!isLocked && isPulse && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                   <motion.div 
                     animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.1, 0.2, 0.1] }}
@@ -421,36 +450,35 @@ export default function HomeHub() {
               )}
 
               {/* STRESS SMASHER KINETIC SHATTER (DAY 15) */}
-{!isLocked && isStressSmasher && (
-  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none overflow-hidden">
-    {/* Impact Ripples */}
-    {[...Array(2)].map((_, i) => (
-      <motion.div 
-        key={i}
-        animate={{ scale: [1, 2.5], opacity: [0.5, 0] }}
-        transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.4 }}
-        className="absolute inset-0 border-2 border-[#bfff00]/30 rounded-full"
-      />
-    ))}
-    {/* Flying Shards */}
-    {[...Array(6)].map((_, i) => (
-      <motion.div
-        key={`shard-${i}`}
-        initial={{ x: 0, y: 0, opacity: 0 }}
-        animate={{ 
-          x: (i % 2 === 0 ? 1 : -1) * (Math.random() * 100 + 50), 
-          y: (Math.random() - 0.5) * 200,
-          rotate: 360,
-          opacity: [0, 1, 0]
-        }}
-        transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
-        className="absolute top-1/2 left-1/2 w-2 h-2 bg-[#bfff00] rounded-sm"
-      />
-    ))}
-    <div className="absolute bottom-4 left-8 font-mono text-[7px] text-red-500 tracking-[0.3em] uppercase animate-pulse">Impact_Detected</div>
-  </div>
-)}
-              {/* STRESS SMASHER KINETIC SHATTER (DAY 16) */}
+              {!isLocked && isStressSmasher && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none overflow-hidden">
+                  {[...Array(2)].map((_, i) => (
+                    <motion.div 
+                      key={i}
+                      animate={{ scale: [1, 2.5], opacity: [0.5, 0] }}
+                      transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.4 }}
+                      className="absolute inset-0 border-2 border-[#bfff00]/30 rounded-full"
+                    />
+                  ))}
+                  {[...Array(6)].map((_, i) => (
+                    <motion.div
+                      key={`shard-${i}`}
+                      initial={{ x: 0, y: 0, opacity: 0 }}
+                      animate={{ 
+                        x: (i % 2 === 0 ? 1 : -1) * (Math.random() * 100 + 50), 
+                        y: (Math.random() - 0.5) * 200,
+                        rotate: 360,
+                        opacity: [0, 1, 0]
+                      }}
+                      transition={{ duration: 1, repeat: Infinity, delay: i * 0.1 }}
+                      className="absolute top-1/2 left-1/2 w-2 h-2 bg-[#bfff00] rounded-sm"
+                    />
+                  ))}
+                  <div className="absolute bottom-4 left-8 font-mono text-[7px] text-red-500 tracking-[0.3em] uppercase animate-pulse">Impact_Detected</div>
+                </div>
+              )}
+
+              {/* GLITCH AUTH EFFECT (DAY 16) */}
               {!isLocked && isGlitchAuth && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,0,0,0.05)_3px)]" />
@@ -461,15 +489,6 @@ export default function HomeHub() {
                   >
                     UNAUTHORIZED_ACCESS_DETECTED
                   </motion.div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div 
-                          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
-                          transition={{ repeat: Infinity, duration: 1 }}
-                          className="w-32 h-32 border border-red-500/30 rounded-full flex items-center justify-center"
-                      >
-                          <div className="w-16 h-16 border border-red-500/50 rounded-full animate-ping" />
-                      </motion.div>
-                  </div>
                 </div>
               )}
 
@@ -514,12 +533,6 @@ export default function HomeHub() {
                 </div>
               )}
 
-              {!isLocked && isApplyFlow && (
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
-                  <motion.div animate={{ translateY: ["-100%", "200%"] }} transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }} className="absolute inset-x-0 h-20 bg-gradient-to-b from-transparent via-blue-500/10 to-transparent z-10" />
-                </div>
-              )}
-
               {isLocked && (
                   <div className="absolute top-6 right-6 flex flex-col items-end gap-1 pointer-events-none">
                     <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800">
@@ -540,6 +553,7 @@ export default function HomeHub() {
                       isFocusAura ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/50 group-hover:text-[#bfff00]' :
                       isAuraGate ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/50 group-hover:text-[#bfff00]' : 
                       isPulse ? 'group-hover:bg-rose-500/10 group-hover:border-rose-500/50 group-hover:text-rose-400' :
+                      isOnyxLens ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' :
                       'group-hover:border-orange-500/50'
                     )
                   }`}>
@@ -552,6 +566,7 @@ export default function HomeHub() {
                       isMorphos ? 'group-hover:text-[#bfff00] font-serif italic' : 
                       isV10 ? 'group-hover:text-lime-400' :
                       isFocusAura ? 'group-hover:text-[#bfff00]' :
+                      isOnyxLens ? 'group-hover:text-cyan-400 font-black tracking-tight' :
                       isAuraGate ? 'group-hover:text-[#bfff00] font-black italic' : 
                       isLethalEff ? 'group-hover:text-[#bfff00] font-mono uppercase tracking-tighter' : 
                       isStressSmasher ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/50 group-hover:text-[#bfff00] group-hover:rotate-12' :
@@ -560,11 +575,10 @@ export default function HomeHub() {
                   }`}>
                     {project.title} 
                     {!isLocked && <ArrowRight size={18} className={`opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all ${
+                      isOnyxLens ? 'text-cyan-400' :
                       isMorphos || isFocusAura ? 'text-[#bfff00]' :
                       isAuraGate ? 'text-[#bfff00]' :
-                      isLethalEff ? 'text-[#bfff00]' : 
                       isPulse ? 'text-rose-500' :
-                      isStressSmasher ? 'group-hover:text-[#bfff00] group-hover:scale-105' :
                       isLedger ? 'text-emerald-500' : 'text-orange-500' 
                     }`} />}
                   </h3>
