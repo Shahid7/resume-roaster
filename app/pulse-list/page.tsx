@@ -1,7 +1,9 @@
-import React from 'react';
-import { Shield, Clock, Zap, Globe, Layout, CheckCircle2 } from 'lucide-react';
+"use client";
 
-const Day18Page = () => {
+import React from 'react';
+import { Shield, Clock, Zap, Globe, Layout, CheckCircle2, MessageCircle, PlayCircle, Mail } from 'lucide-react';
+
+const Day17Page = () => {
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -11,7 +13,7 @@ const Day18Page = () => {
       padding: '80px 20px'
     }}>
       {/* Hero Section */}
-      <header style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center', marginBottom: '100px' }}>
+      <header style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center', marginBottom: '60px' }}>
         <div style={{ 
           display: 'inline-block', 
           padding: '8px 16px', 
@@ -23,15 +25,45 @@ const Day18Page = () => {
           letterSpacing: '2px',
           marginBottom: '24px'
         }}>
-          DAY 18: PROJECT PULSE
+          DAY 17: PROJECT PULSE
         </div>
         <h1 style={{ fontSize: '64px', fontWeight: '800', letterSpacing: '-2px', margin: '0 0 20px 0', lineHeight: '1' }}>
-          Pulse Architect
+          Pulse List
         </h1>
         <p style={{ fontSize: '20px', color: '#588157', maxWidth: '600px', margin: '0 auto' }}>
           A digital focus shield designed to architect your attention and protect your deep work sessions.
         </p>
       </header>
+
+      {/* --- NEW: ACCESS & DEMO SECTION --- */}
+      <section style={{ maxWidth: '800px', margin: '0 auto 80px auto', textAlign: 'center' }}>
+        <div style={{ 
+          backgroundColor: 'rgba(163, 177, 138, 0.2)', 
+          padding: '30px', 
+          borderRadius: '32px', 
+          border: '2px dashed #A3B18A',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '20px'
+        }}>
+          <h2 style={{ fontSize: '24px', fontWeight: '800', margin: 0 }}>Get the Extension</h2>
+          <p style={{ fontSize: '16px', color: '#3A5A40', margin: 0, opacity: 0.9 }}>
+            This extension is currently in <strong>Private Beta</strong>. To start using the Focus Shield:
+          </p>
+          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <a href="mailto:shaahidlee@gmail.com" style={ctaButtonStyle}>
+              <Mail size={18} /> Email Me
+            </a>
+            <a href="https://linkedin.com/in/shahidalisethi" style={ctaButtonStyle}>
+              <MessageCircle size={18} /> DM for Access
+            </a>
+            <a href="https://www.linkedin.com/posts/shahidalisethi_30daysofcode-buildinpublic-reactjs-ugcPost-7428484052229341184-GqeK?utm_source=share&utm_medium=member_desktop&rcm=ACoAABjO5GEBeu6NroVXakiMyHBCPLHvV2SmkLE" target="_blank" rel="noopener noreferrer" style={{...ctaButtonStyle, backgroundColor: '#3A5A40', color: '#F2E8CF'}}>
+              <PlayCircle size={18} /> Watch Demo Video
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* Instruction Grid */}
       <main style={{ maxWidth: '1100px', margin: '0 auto' }}>
@@ -41,7 +73,6 @@ const Day18Page = () => {
           gap: '40px',
           marginBottom: '100px'
         }}>
-          {/* Step 1 */}
           <div style={cardStyle}>
             <Layout size={32} style={{ marginBottom: '20px', color: '#A3B18A' }} />
             <h3 style={stepTitle}>1. The Interface</h3>
@@ -50,7 +81,6 @@ const Day18Page = () => {
             </p>
           </div>
 
-          {/* Step 2 */}
           <div style={cardStyle}>
             <Clock size={32} style={{ marginBottom: '20px', color: '#A3B18A' }} />
             <h3 style={stepTitle}>2. Define the Pulse</h3>
@@ -59,7 +89,6 @@ const Day18Page = () => {
             </p>
           </div>
 
-          {/* Step 3 */}
           <div style={cardStyle}>
             <Shield size={32} style={{ marginBottom: '20px', color: '#A3B18A' }} />
             <h3 style={stepTitle}>3. The Focus Shield</h3>
@@ -96,21 +125,36 @@ const Day18Page = () => {
             border: '1px solid rgba(242, 232, 207, 0.2)' 
           }}>
             <p style={{ fontSize: '14px', fontStyle: 'italic', opacity: 0.8, lineHeight: '1.8' }}>
-              "Procrastination is the thief of time. Pulse Architect doesn't just track time; it reclaims it by making the cost of distraction visible."
+              "Procrastination is the thief of time. Pulse List doesn't just track time; it reclaims it by making the cost of distraction visible."
             </p>
-            <div style={{ marginTop: '20px', fontWeight: 'bold', fontSize: '14px' }}>— SHAHID LABS DEPLOYMENT</div>
+            <div style={{ marginTop: '20px', fontWeight: 'bold', fontSize: '14px' }}>— SHAHID ALI SETHI</div>
           </div>
         </section>
       </main>
 
       <footer style={{ textAlign: 'center', marginTop: '100px', opacity: 0.6, fontSize: '14px' }}>
-        Built for the 100 Days of Code Challenge • Day 18
+        Built for the 30 Days of Code Challenge • Day 17
       </footer>
     </div>
   );
 };
 
-// --- Helper Components & Styles ---
+// --- Styles ---
+
+const ctaButtonStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  padding: '12px 24px',
+  backgroundColor: '#A3B18A',
+  color: 'white',
+  borderRadius: '12px',
+  fontSize: '14px',
+  fontWeight: 'bold',
+  textDecoration: 'none',
+  transition: 'transform 0.2s ease',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+};
 
 const cardStyle = {
   backgroundColor: 'white',
@@ -140,4 +184,4 @@ const FeatureItem = ({ icon, text }: { icon: React.ReactNode, text: string }) =>
   </div>
 );
 
-export default Day18Page;
+export default Day17Page;

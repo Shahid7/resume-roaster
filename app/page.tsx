@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 // ADDED Database TO IMPORTS
-import { HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio, Scan } from 'lucide-react';
+import { Globe, HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio, Scan } from 'lucide-react';
 import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
@@ -191,21 +191,41 @@ const PROJECTS = [
     color: "from-red-600/20 to-zinc-900/20"
   },
   {
+    title: "Pulse List", // DAY 17
+    desc: "Browser-level focus shield. Lock distraction tabs behind a glassmorphism firewall.",
+    path: "/pulse-list",
+    icon: <ShieldCheck />,
+    vibe: "peace",
+    status: "unlocked",
+    date: "DAY 17",
+    color: "from-emerald-400/20 to-zinc-900/20"
+  },
+  {
     title: "Onyx Lens",
     desc: "Hardware-accelerated optical focus engine. Blueprint-sync reading for deep cognitive immersion.",
     path: "/onyx-lens",
     icon: <Scan />,
-    vibe: "momentum",
+    vibe: "peace",
     status: "unlocked",
-    date: "DAY 17",
+    date: "DAY 18",
     color: "from-cyan-400/20 to-blue-900/20"
   },
-  ...Array.from({ length: 13 }).map((_, i) => {
-    const dayNumber = 14 + i;
+  {
+    title: "Mate Sync", 
+    desc: "Neural-linked global timeline. Synchronize cross-border momentum through golden-hour detection.",
+    path: "/mate-sync",
+    icon: <Globe />,
+    vibe: "peace",
+    status: "unlocked",
+    date: "DAY 19",
+    color: "from-amber-400/20 to-blue-900/20"
+  },
+  ...Array.from({ length: 11 }).map((_, i) => {
+    const dayNumber = 16 + i;
     const displayDate = `${dayNumber + 3} FEB`;
     
     return {
-      title: `Project ${i + 18}`,
+      title: `Project ${i + 20}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -343,7 +363,9 @@ export default function HomeHub() {
           const isPulse = project.title === "Pulse";
           const isStressSmasher = project.title === "Stress Smasher";
           const isGlitchAuth = project.title === "Glitch Auth";
+          const isPulseList = project.title === "Pulse List"; 
           const isOnyxLens = project.title === "Onyx Lens";
+          const isMateSync = project.title === "Mate Sync"; 
           const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
           return (
@@ -359,7 +381,37 @@ export default function HomeHub() {
                 isLocked ? 'border-zinc-900 bg-zinc-950/20' : 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-600'
               }`}
             >
-              {/* ONYX LENS FOCUS EFFECT (DAY 17) */}
+
+              {/* NEW: DAY 17 PULSE ARCHITECT SHIELD EFFECT */}
+            {!isLocked && isPulseList && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                    <div className="absolute inset-0 backdrop-blur-[4px] bg-emerald-500/5" />
+                    <motion.div 
+                        animate={{ opacity: [0, 0.5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="absolute inset-0 border-2 border-emerald-500/20 m-4 rounded-2xl"
+                    />
+                    <div className="absolute top-4 right-8 font-mono text-[7px] text-emerald-400 tracking-[0.4em] uppercase">Shield_Integrity_Locked</div>
+                </div>
+            )}
+
+            {/* NEW: DAY 19 AERO SYNC GOLDEN GLOW EFFECT */}
+            {!isLocked && isMateSync && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                    <motion.div 
+                        animate={{ background: [
+                            'radial-gradient(circle at 0% 0%, rgba(245,158,11,0.15) 0%, transparent 50%)',
+                            'radial-gradient(circle at 100% 100%, rgba(59,130,246,0.15) 0%, transparent 50%)',
+                            'radial-gradient(circle at 0% 0%, rgba(245,158,11,0.15) 0%, transparent 50%)',
+                        ]}}
+                        transition={{ duration: 5, repeat: Infinity }}
+                        className="absolute inset-0"
+                    />
+                    <div className="absolute bottom-4 left-8 font-mono text-[7px] text-amber-500/50 tracking-[0.3em]">GOLDEN_WINDOW_ACTIVE</div>
+                </div>
+            )}
+
+              {/* ONYX LENS FOCUS EFFECT (DAY 18) */}
               {!isLocked && isOnyxLens && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
                   <div className="absolute inset-0 bg-cyan-500/5 backdrop-blur-[2px]" />
@@ -553,7 +605,9 @@ export default function HomeHub() {
                       isFocusAura ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/50 group-hover:text-[#bfff00]' :
                       isAuraGate ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/50 group-hover:text-[#bfff00]' : 
                       isPulse ? 'group-hover:bg-rose-500/10 group-hover:border-rose-500/50 group-hover:text-rose-400' :
+                      isPulseList ? 'group-hover:text-emerald-400' :
                       isOnyxLens ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' :
+                      isMateSync ? 'group-hover:text-amber-400' :
                       'group-hover:border-orange-500/50'
                     )
                   }`}>
@@ -579,6 +633,8 @@ export default function HomeHub() {
                       isMorphos || isFocusAura ? 'text-[#bfff00]' :
                       isAuraGate ? 'text-[#bfff00]' :
                       isPulse ? 'text-rose-500' :
+                      isPulseList ? 'text-emerald-500' :
+                      isMateSync ? 'text-amber-500' :
                       isLedger ? 'text-emerald-500' : 'text-orange-500' 
                     }`} />}
                   </h3>
