@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 // ADDED Database TO IMPORTS
-import { Globe, HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio, Scan } from 'lucide-react';
+import { Globe, Moon, HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio, Scan } from 'lucide-react';
 import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
@@ -220,12 +220,22 @@ const PROJECTS = [
     date: "DAY 19",
     color: "from-amber-400/20 to-blue-900/20"
   },
-  ...Array.from({ length: 11 }).map((_, i) => {
-    const dayNumber = 16 + i;
+  {
+    title: "Ramadan Tracker",
+    desc: "This app is designed specifically for Ramadan and its rituals.",
+    path: "/ramadan-tracker",
+    icon: <Moon />,
+    vibe: "peace",
+    status: "unlocked",
+    date: "DAY 20",
+    color: "from-indigo-950/40 to-zinc-900/20"
+  },
+  ...Array.from({ length: 10 }).map((_, i) => {
+    const dayNumber = 20 + i;
     const displayDate = `${dayNumber + 3} FEB`;
     
     return {
-      title: `Project ${i + 20}`,
+      title: `Project ${i + 21}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -430,6 +440,38 @@ export default function HomeHub() {
                   <div className="absolute top-4 right-8 font-mono text-[7px] text-cyan-400 tracking-[0.4em] uppercase">Optic_Sync_Active</div>
                 </div>
               )}
+
+              {/* DAY 20: LAYL GRAVITY MOONLIGHT EFFECT */}
+{!isLocked && project.title === "Ramadan Tracker" && (
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none overflow-hidden">
+    {/* Soft Lunar Glow */}
+    <motion.div 
+      animate={{ 
+        opacity: [0.1, 0.3, 0.1],
+        boxShadow: ["0 0 40px rgba(59,130,246,0.1)", "0 0 80px rgba(59,130,246,0.2)", "0 0 40px rgba(59,130,246,0.1)"]
+      }}
+      transition={{ duration: 4, repeat: Infinity }}
+      className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full"
+    />
+    {/* Floating Particles (representing stars/dust) */}
+    {[...Array(5)].map((_, i) => (
+      <motion.div
+        key={i}
+        animate={{ 
+          y: [0, -40, 0],
+          opacity: [0, 0.5, 0]
+        }}
+        transition={{ duration: 3 + i, repeat: Infinity, delay: i * 0.5 }}
+        className="absolute w-[1px] h-[1px] bg-white rounded-full"
+        style={{ 
+          top: `${Math.random() * 100}%`, 
+          left: `${Math.random() * 100}%` 
+        }}
+      />
+    ))}
+    
+  </div>
+)}
 
               {/* FOCUS-AURA FREQUENCY RIPPLE */}
               {!isLocked && isFocusAura && (
