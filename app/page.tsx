@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 // ADDED Database TO IMPORTS
-import { Globe, Moon, HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio, Scan } from 'lucide-react';
+import { Globe, Moon, HeartPulse, Activity, Terminal, ShieldCheck, Binary, Fingerprint, Camera, Database, Briefcase, Zap, Target, Flame, Palette, Sparkles, ArrowRight, Github, Twitter, Lock, Cpu, Wand2, ScrollText, Radio, Scan, Trophy } from 'lucide-react';
 import ActivityTicker from '@/components/ActivityTicker';
 
 // 1. SCRAMBLE COMPONENT
@@ -230,12 +230,32 @@ const PROJECTS = [
     date: "DAY 20",
     color: "from-indigo-950/40 to-zinc-900/20"
   },
-  ...Array.from({ length: 10 }).map((_, i) => {
-    const dayNumber = 20 + i;
-    const displayDate = `${dayNumber + 3} FEB`;
+  {
+    title: "Sunnatul Layl",
+    desc: "Optimizing the night through prophetic sleep and prayer protocols.",
+    path: "/diary",
+    icon: <Moon />,
+    vibe: "peace",
+    status: "unlocked",
+    date: "LIVE",
+    color: "from-indigo-500/20 to-purple-900/20"
+  },
+  {
+    title: "Hifz Studio Ultra",
+    desc: "Precision AI-coaching for Quranic memorization and retention.",
+    path: "/hifz-path",
+    icon: <Trophy />,
+    vibe: "momentum",
+    status: "unlocked",
+    date: "LIVE",
+    color: "from-orange-400/20 to-amber-900/20"
+  },
+  ...Array.from({ length: 8 }).map((_, i) => {
+    const dayNumber = 1 + i;
+    const displayDate = `${dayNumber + 3} March`;
     
     return {
-      title: `Project ${i + 21}`,
+      title: `Project ${i + 23}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -380,6 +400,7 @@ useEffect(() => {
           const isPulseList = project.title === "Pulse List"; 
           const isOnyxLens = project.title === "Onyx Lens";
           const isMateSync = project.title === "Mate Sync"; 
+          const isHifz = project.title === "Hifz Studio Ultra";
           const isHidden = (vibe === 'chaos' && project.vibe === 'peace') || (vibe === 'peace' && project.vibe === 'chaos');
 
           return (
@@ -446,7 +467,7 @@ useEffect(() => {
               )}
 
               {/* DAY 20: LAYL GRAVITY MOONLIGHT EFFECT */}
-{!isLocked && project.title === "Ramadan Tracker" && (
+{!isLocked && (project.title === "Ramadan Tracker" || project.title === "Sunnatul Layl") && (
   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none overflow-hidden">
     {/* Soft Lunar Glow */}
     <motion.div 
@@ -458,7 +479,8 @@ useEffect(() => {
       className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full"
     />
     {/* Floating Particles (representing stars/dust) */}
-    {[...Array(5)].map((_, i) => (
+    {isMounted && [...Array(5)].map((_, i) => (
+
       <motion.div
         key={i}
         animate={{ 
@@ -654,6 +676,7 @@ useEffect(() => {
                       isPulseList ? 'group-hover:text-emerald-400' :
                       isOnyxLens ? 'group-hover:bg-cyan-500/10 group-hover:border-cyan-500/50 group-hover:text-cyan-400' :
                       isMateSync ? 'group-hover:text-amber-400' :
+                      isHifz ? 'group-hover:bg-orange-500/10 group-hover:border-orange-500/50 group-hover:text-orange-400' :
                       'group-hover:border-orange-500/50'
                     )
                   }`}>
@@ -670,7 +693,8 @@ useEffect(() => {
                       isAuraGate ? 'group-hover:text-[#bfff00] font-black italic' : 
                       isLethalEff ? 'group-hover:text-[#bfff00] font-mono uppercase tracking-tighter' : 
                       isStressSmasher ? 'group-hover:bg-[#bfff00]/10 group-hover:border-[#bfff00]/50 group-hover:text-[#bfff00] group-hover:rotate-12' :
-                      isApplyFlow ? 'group-hover:text-blue-400' : '' 
+                      isApplyFlow ? 'group-hover:text-blue-400' : 
+                      isHifz ? 'group-hover:text-orange-400 font-black tracking-tight' : '' 
                     )
                   }`}>
                     {project.title} 
@@ -681,6 +705,7 @@ useEffect(() => {
                       isPulse ? 'text-rose-500' :
                       isPulseList ? 'text-emerald-500' :
                       isMateSync ? 'text-amber-500' :
+                      isHifz ? 'text-orange-500' :
                       isLedger ? 'text-emerald-500' : 'text-orange-500' 
                     }`} />}
                   </h3>
