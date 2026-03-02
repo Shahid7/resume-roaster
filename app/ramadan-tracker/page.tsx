@@ -205,6 +205,20 @@ const requestNotificationPermission = async () => {
     if (holdIntervalRef.current) clearInterval(holdIntervalRef.current);
     setHoldProgress(0); // Snap ring back to 0 if they let go
   };
+// this is for offline loading of the app
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then((registration) => {
+          console.log('SW registered:', registration);
+        }).catch((error) => {
+          console.log('SW registration failed:', error);
+        });
+      });
+    }
+  }, []);
+
+
 
   const [isNightTime, setIsNightTime] = useState(false);
 
@@ -221,6 +235,28 @@ useEffect(() => {
   const interval = setInterval(checkTime, 60000); 
   return () => clearInterval(interval);
 }, []);
+
+useEffect(() => {
+  if (!user) return; // Guard clause inside the hook instead of outside
+
+  const handleOnline = () => {
+    const raw = localStorage.getItem('qamar_vault_cache');
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.unsynced) {
+        sync({
+          count: data.tasbeeh_count,
+          log: data.fasting_days,
+          quran: data.quran_progress,
+          checks: data.ritual_checks
+        });
+      }
+    }
+  };
+
+  window.addEventListener('online', handleOnline);
+  return () => window.removeEventListener('online', handleOnline);
+}, [user]); // ✅ Always keep [user] here, even if user is null
 
   const handleAuth = async () => {
     if (!tempName || !tempPass) return alert("Fill all fields");
@@ -544,7 +580,21 @@ useEffect(() => {
 
       // Calculate Day 4 (Feb 22 - 18 = 4)
       const dayOfMonth = now.getDate();
-      setRamadanDay(dayOfMonth - 18); 
+      const month = now.getMonth(); // 1 = Feb, 2 = March
+      const day = now.getDate();
+
+      let ramadanDayCalc = 0;
+
+      if (month === 1) { 
+        // February Logic: Starts Feb 19 (Day 1)
+        ramadanDayCalc = day - 18; 
+      } else if (month === 2) { 
+        // March Logic: Feb had 28 days. (28 - 18) = 10 days in Feb.
+        // So Day 1 of March is Day 11 of Ramadan.
+        ramadanDayCalc = day + 10; 
+      }
+
+      setRamadanDay(ramadanDayCalc);
       
       setCity("Mingora");
       setIsExternalCity(false); // Tell engine to use local logic
@@ -725,127 +775,217 @@ if (diff <= 2000 && diff > -2000 && !celebrated) {
 
   const [authLoading, setAuthLoading] = useState(false);
 
-const loadUserData = async (name: string, passwordInput: string) => {
-  setAuthLoading(true);
-  const cleanName = name.toLowerCase().trim();
-  
-  // 1. LOOK FOR EXACT MATCH (Name AND Password)
-  let { data: vault, error } = await supabase
-    .from('user_vaults')
-    .select('*')
-    .eq('user_name', cleanName)
-    .eq('password', passwordInput) // Check both at once
-    .single();
-
-  if (!vault) {
-    // 2. CHECK IF NAME IS TAKEN BY SOMEONE ELSE
-    let { data: nameCheck } = await supabase
+  const loadUserData = async (name: string, passwordInput: string) => {
+    setAuthLoading(true);
+    const cleanName = name.toLowerCase().trim();
+    
+    // 1. LOOK FOR EXACT MATCH
+    let { data: vault, error } = await supabase
       .from('user_vaults')
-      .select('user_name')
+      .select('*')
       .eq('user_name', cleanName)
+      .eq('password', passwordInput)
       .single();
-
-    if (nameCheck) {
-      alert("This name is already registered. Please use your correct password or a different name.");
-      setAuthLoading(false);
-      return;
+  
+    if (!vault) {
+      // 2. CHECK IF NAME IS TAKEN
+      let { data: nameCheck } = await supabase
+        .from('user_vaults')
+        .select('user_name')
+        .eq('user_name', cleanName)
+        .single();
+  
+      if (nameCheck) {
+        alert("This name is already registered. Please use your correct password or a different name.");
+        setAuthLoading(false);
+        return;
+      }
+  
+      // 3. REGISTER NEW USER
+      const { data: newUser } = await supabase
+        .from('user_vaults')
+        .insert([{ 
+          user_name: cleanName, 
+          password: passwordInput,
+          tasbeeh_count: 0,
+          fasting_days: INITIAL_FASTING_DAYS
+        }])
+        .select().single();
+      vault = newUser;
     }
-
-    // 3. REGISTER NEW USER (If name doesn't exist at all)
-    const { data: newUser } = await supabase
-      .from('user_vaults')
-      .insert([{ 
-        user_name: cleanName, 
-        password: passwordInput,
-        tasbeeh_count: 0,
-        fasting_days: ["2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23"] // Bonus days
-      }])
-      .select().single();
-    vault = newUser;
-  }
-
-  // 4. PREPARE DATA (Your Mingora Logic)
-  const now = new Date();
-  const dateStr = now.toISOString().split('T')[0];
-  let updatedLog = [...(vault.fasting_days || [])];
-
-  const timings = MINGORA_TIMINGS[dateStr];
-  if (timings) {
-    const [iH, iM] = timings.iftar.split(':').map(Number);
-    const iftarTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), iH, iM);
-    if (now > iftarTime && !updatedLog.includes(dateStr)) {
-      updatedLog.push(dateStr);
-    }
-  }
-
-// Check if the pre-marked days are missing and add them
-const missingDays = INITIAL_FASTING_DAYS.filter(day => !updatedLog.includes(day));
-if (missingDays.length > 0) {
-    updatedLog = [...updatedLog, ...missingDays];
-    // Sync this back to DB so the user "gets" the 6 days permanently
-    sync({ log: updatedLog }); 
-}
-
-
-
-  // 5. FINALIZE UI
-  setCount(vault.tasbeeh_count);
-  setFastingLog(updatedLog);
-  setQuranProgress(vault.quran_progress || 0);
-  setUser({ name: cleanName });
-
-  // DIRECT CALL (No useEffect here!)
-if ('Notification' in window) {
-  Notification.requestPermission().then(permission => {
-    if (permission === 'granted') {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js');
+  
+    // 4. PREPARE DATA
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    let updatedLog = [...(vault.fasting_days || [])];
+  
+    const timings = MINGORA_TIMINGS[dateStr];
+    if (timings) {
+      const [iH, iM] = timings.iftar.split(':').map(Number);
+      const iftarTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), iH, iM);
+      if (now > iftarTime && !updatedLog.includes(dateStr)) {
+        updatedLog.push(dateStr);
       }
     }
-  });
-}
   
-  localStorage.setItem('q_active_session', cleanName);
-  localStorage.setItem('q_active_pass', passwordInput);
-
-  setAuthLoading(false); // End loading
-  setIsLoginView(false);
-  setShowWelcome(true);
-  setTimeout(() => setShowWelcome(false), 2500);
-};
+    const missingDays = INITIAL_FASTING_DAYS.filter(day => !updatedLog.includes(day));
+    if (missingDays.length > 0) {
+        updatedLog = [...updatedLog, ...missingDays];
+    }
+  
+    // 5. FINALIZE UI STATE
+    setCount(vault.tasbeeh_count || 0);
+    setFastingLog(updatedLog);
+    setQuranProgress(vault.quran_progress || 0);
+    setCheckedItems(vault.ritual_checks || []); // Load your sunnah checks too!
+    setUser({ name: cleanName }); // Setting state as an object so user.name works in UI
+  
+    // 6. NOTIFICATIONS & PWA
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted' && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/sw.js');
+        }
+      });
+    }
+    
+    // 7. STORAGE MANAGEMENT
+    // Keep the session key as a simple string so it doesn't break your UI
+    localStorage.setItem('q_active_session', cleanName);
+    localStorage.setItem('q_active_pass', passwordInput);
+  
+    // Initialize the Offline Cache with a clean object
+    const offlineCache = {
+      user_name: cleanName,
+      tasbeeh_count: vault.tasbeeh_count || 0,
+      fasting_days: updatedLog,
+      quran_progress: vault.quran_progress || 0,
+      ritual_checks: vault.ritual_checks || [],
+      unsynced: false
+    };
+    localStorage.setItem('qamar_vault_cache', JSON.stringify(offlineCache));
+  
+    setAuthLoading(false);
+    setIsLoginView(false);
+    setShowWelcome(true);
+    setTimeout(() => setShowWelcome(false), 2500);
+  
+    // Trigger one sync to ensure the "Bonus Days" or Iftar auto-marks are saved to DB
+    sync({ log: updatedLog }); 
+  };
 
 const sync = async (payload: any) => {
   const sessionName = localStorage.getItem('q_active_session');
   if (!sessionName) return;
 
-  // 1. Prepare the data for the 'user_vaults' table
+  // 1. GET CURRENT LOCAL DATA (to avoid overwriting other fields)
+  let localData: any = {};
+  try {
+    const raw = localStorage.getItem('qamar_vault_cache');
+    localData = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    localData = {};
+  }
+
+  // 2. PREPARE THE UPDATE PAYLOAD
   const updatePayload: any = {
-    last_active: new Date().toISOString()
+    ...localData, // Keep existing cached data
+    last_active: new Date().toISOString(),
+    unsynced: !navigator.onLine // Flag to track if cloud is behind
   };
 
+  // Map incoming payload to Database columns
   if (payload.count !== undefined) updatePayload.tasbeeh_count = payload.count;
   if (payload.log !== undefined) updatePayload.fasting_days = payload.log;
   if (payload.quran !== undefined) updatePayload.quran_progress = payload.quran;
-  
-  // ADDED: Handle the Rituals (Tahajjud, Sadaqah, etc.)
   if (payload.checks !== undefined) updatePayload.ritual_checks = payload.checks;
-
-  // ADDED: Handle the Sunnatul Layl (Nightly Diary) 
-  // We store the most recent night's data in the vault
+  
   if (payload.sunnah_completed !== undefined) {
     updatePayload.last_nightly_sunnah = payload.sunnah_completed;
     updatePayload.tahajjud_intent = payload.tahajjud_intent;
+  }
+
+  // 3. SAVE TO LOCAL STORAGE IMMEDIATELY (Offline Safety)
+  localStorage.setItem('qamar_vault_cache', JSON.stringify(updatePayload));
+
+  // 4. PUSH TO SUPABASE (Only if Online)
+  if (navigator.onLine) {
+    try {
+      // Update Main Vault
+      const { error: vaultError } = await supabase
+        .from('user_vaults')
+        .update({
+           tasbeeh_count: updatePayload.tasbeeh_count,
+           fasting_days: updatePayload.fasting_days,
+           quran_progress: updatePayload.quran_progress,
+           ritual_checks: updatePayload.ritual_checks,
+           last_nightly_sunnah: updatePayload.last_nightly_sunnah,
+           tahajjud_intent: updatePayload.tahajjud_intent,
+           last_active: updatePayload.last_active
+        })
+        .eq('user_name', sessionName.toLowerCase().trim());
+
+      // If sunnah data exists, upsert to the Registry too
+      if (payload.sunnah_completed !== undefined) {
+        const today = new Date().toISOString().split('T')[0];
+        await supabase
+          .from('nightly_registry')
+          .upsert({ 
+              user_name: sessionName.toLowerCase().trim(), 
+              date: today, 
+              intent: payload.tahajjud_intent,
+              completed_items: payload.sunnah_completed,
+            }, 
+            { onConflict: 'user_name,date' }
+          );
+      }
+
+      if (!vaultError) {
+        console.log("Cloud Synchronized Successfully ✅");
+        // Mark as synced locally
+        updatePayload.unsynced = false;
+        localStorage.setItem('qamar_vault_cache', JSON.stringify(updatePayload));
+      }
+    } catch (err) {
+      console.error("Network request failed. Data remains cached locally.");
+    }
+  } else {
+    console.log("Offline: Changes saved to local cache. Will sync when online.");
+  }
+};
+
+// const sync = async (payload: any) => {
+//   const sessionName = localStorage.getItem('q_active_session');
+//   if (!sessionName) return;
+
+  // 1. Prepare the data for the 'user_vaults' table
+  // const updatePayload: any = {
+  //   last_active: new Date().toISOString()
+  // };
+
+  // if (payload.count !== undefined) updatePayload.tasbeeh_count = payload.count;
+  // if (payload.log !== undefined) updatePayload.fasting_days = payload.log;
+  // if (payload.quran !== undefined) updatePayload.quran_progress = payload.quran;
+  
+  // ADDED: Handle the Rituals (Tahajjud, Sadaqah, etc.)
+  // if (payload.checks !== undefined) updatePayload.ritual_checks = payload.checks;
+
+  // ADDED: Handle the Sunnatul Layl (Nightly Diary) 
+  // We store the most recent night's data in the vault
+  // if (payload.sunnah_completed !== undefined) {
+  //   updatePayload.last_nightly_sunnah = payload.sunnah_completed;
+  //   updatePayload.tahajjud_intent = payload.tahajjud_intent;
 
     // This is the part that fills the History/Registry
-    const { error: regError } = await supabase
-      .from('nightly_registry')
-      .insert([{
-        user_name: sessionName.toLowerCase(), // Ensure this matches user_vaults user_name
-        completed_items: payload.sunnah_completed,
-        intent: payload.tahajjud_intent,
-        date: new Date().toISOString().split('T')[0] // explicitly set the date
-      }]);
-  }
+  //   const { error: regError } = await supabase
+  //     .from('nightly_registry')
+  //     .insert([{
+  //       user_name: sessionName.toLowerCase(), // Ensure this matches user_vaults user_name
+  //       completed_items: payload.sunnah_completed,
+  //       intent: payload.tahajjud_intent,
+  //       date: new Date().toISOString().split('T')[0] // explicitly set the date
+  //     }]);
+  // }
 
   // const saveToRegistry = async () => {
   //   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -863,17 +1003,17 @@ const sync = async (payload: any) => {
   // };
 
   // 2. Push to Supabase
-  const { error } = await supabase
-    .from('user_vaults')
-    .update(updatePayload)
-    .eq('user_name', sessionName.toLowerCase());
+//   const { error } = await supabase
+//     .from('user_vaults')
+//     .update(updatePayload)
+//     .eq('user_name', sessionName.toLowerCase());
 
-  if (error) {
-    console.error("Sync Error:", error.message);
-  } else {
-    console.log("Vault Synchronized Successfully");
-  }
-};
+//   if (error) {
+//     console.error("Sync Error:", error.message);
+//   } else {
+//     console.log("Vault Synchronized Successfully");
+//   }
+// };
 
   if (isLoginView) return (
     <div className="min-h-screen bg-[#EBE7D9] flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -1236,6 +1376,17 @@ const sync = async (payload: any) => {
       Tap to count • Hold to reset
     </motion.p>
   </div>
+  {/* Add this near your Tasbeeh counter or Clock */}
+{!navigator.onLine && (
+  <motion.div 
+    initial={{ opacity: 0 }} 
+    animate={{ opacity: 1 }}
+    className="flex items-center gap-2 text-amber-500/80 text-xs mt-2"
+  >
+    <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+    Offline Mode: Data saved locally
+  </motion.div>
+)}
 </section>
   
               <aside className="lg:col-span-5">
