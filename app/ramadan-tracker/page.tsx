@@ -153,6 +153,13 @@ export default function QamarFinal() {
     setIsLoginView(true);
   };
 
+  const isSunnahDay = () => {
+    const day = new Date().getDay();
+    return day === 1 || day === 4; // 1 = Monday, 4 = Thursday
+  };
+  
+  const getDayName = () => new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
+
   // 1. Define the function
 const requestNotificationPermission = async () => {
   if (!('Notification' in window)) return;
@@ -1075,7 +1082,12 @@ const sync = async (payload: any) => {
     </motion.div>
   </div>
     
-        
+  {isSunnahDay() && (
+  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 p-3 rounded-xl text-sm mb-4 flex items-center gap-2">
+    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+    Today is {getDayName()} — A Sunnah Day for Fasting.
+  </div>
+)}
 
           {/* UNIQUE ANIMATED TOGGLE */}
 <div className="relative mt-12 w-[220px] bg-[#2D3328]/5 p-1 rounded-full flex items-center cursor-pointer border border-[#2D3328]/5 overflow-hidden">
