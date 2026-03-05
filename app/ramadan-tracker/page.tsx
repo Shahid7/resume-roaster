@@ -141,16 +141,117 @@ export default function QamarFinal() {
   const [showSuggestionPopup, setShowSuggestionPopup] = useState(false);
   const [tempPass, setTempPass] = useState(""); 
   const [celebrated, setCelebrated] = useState(false);
+  const [quranCompletions, setQuranCompletions] = useState<number>(0);
   const [access, setAccess] = useState(false); // or true if you want it open by default for testing
   const INITIAL_FASTING_DAYS = ["2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25"];
   const [activeTab, setActiveTab] = useState<'tracker' | 'sunnah'>('tracker');
   const supabase = createClient('https://rqcbplnanidhqiwpgzrn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxY2JwbG5hbmlkaHFpd3BnenJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3NDEzNzEsImV4cCI6MjA4NTMxNzM3MX0.aikDCClbrh7F5V68uyjUlCuZotedUkeYwdzv8fnvEbA');
   const logout = () => {
+    // 1. Clear the "Active" session (This forces the Login view on refresh)
     localStorage.removeItem('q_active_session');
+    localStorage.removeItem('q_active_pass');
+  
+    // 2. Reset UI State so the next person doesn't see your data
     setUser(null);
-    setCount(0); // Reset UI state
-    setFastingLog([]); // Reset UI state
+    setCount(0);
+    setFastingLog([]);
+    setQuranProgress(0);
+    setCheckedItems([]);
+  
+    // 3. Switch to Login View
     setIsLoginView(true);
+    
+    // NOTE: We leave 'qamar_vault_cache' and 'qamar_offline_auth' 
+    // in localStorage so you can log back in while offline.
+  };
+
+  const updateQuran = (val: number) => {
+    const TARGET_JUZ = 30;
+    let newProgress = val;
+    let newCompletions = quranCompletions;
+  
+    // Logic: If they click the 30th Juz, reset to 0 and add a completion
+    if (newProgress >= TARGET_JUZ) {
+      newProgress = 0; 
+      newCompletions += 1;
+      
+      if (typeof window !== 'undefined' && (window as any).confetti) {
+        (window as any).confetti();
+      }
+    }
+  
+    // Update States
+    setQuranProgress(newProgress);
+    setQuranCompletions(newCompletions);
+    
+    // Sync to Storage & Cloud
+    sync({ 
+      quran: newProgress, 
+      completions: newCompletions 
+    });
+  };
+
+  const renderQuranBadge = () => {
+    if (quranCompletions <= 0) return null;
+  
+    // Tier-based themes: Emerald (Seeker), Sapphire (Guardian), Gold (Sultan)
+    const themes = [
+      { min: 10, color: "#fbbf24", glow: "shadow-[0_0_30px_#fbbf24]", title: "Sultan", ring: "border-yellow-500/50" },
+      { min: 5, color: "#3b82f6", glow: "shadow-[0_0_25px_#3b82f6]", title: "Guardian", ring: "border-blue-500/50" },
+      { min: 1, color: "#10b981", glow: "shadow-[0_0_20px_#10b981]", title: "Seeker", ring: "border-emerald-500/50" }
+    ];
+  
+    const theme = themes.find(t => quranCompletions >= t.min) || themes[2];
+  
+    return (
+      <div className="relative flex items-center justify-center group py-4 px-6">
+        {/* 1. SPIRITUAL RADIANCE (The Background Glow) */}
+        <div className={`absolute w-16 h-16 rounded-full opacity-20 blur-xl animate-pulse ${theme.glow}`} 
+             style={{ backgroundColor: theme.color }}></div>
+  
+        {/* 2. THE GEOMETRIC ARTIFACT */}
+        <div className="relative w-16 h-16 flex items-center justify-center scale-110">
+          
+          {/* Outer Islamic Pattern Ring */}
+          <div className={`absolute inset-0 border-[1px] border-dashed ${theme.ring} rounded-full animate-spin [animation-duration:20s]`}></div>
+          
+          {/* Rotating Rub el Hizb (8-pointed Star) */}
+          {/* Layer 1 */}
+          <div className="absolute w-10 h-10 border-2 transition-transform duration-1000 group-hover:rotate-180" 
+               style={{ borderColor: theme.color, transform: 'rotate(0deg)' }}></div>
+          {/* Layer 2 (The 45 degree offset) */}
+          <div className="absolute w-10 h-10 border-2 transition-transform duration-1000 group-hover:rotate-[-180deg]" 
+               style={{ borderColor: theme.color, transform: 'rotate(45deg)' }}></div>
+  
+          {/* Center Completion Nucleus */}
+          <div className="relative z-10 bg-black/80 backdrop-blur-md w-8 h-8 rounded-full border border-white/20 flex flex-col items-center justify-center shadow-inner">
+            <span className="text-[10px] font-black text-white leading-none">{quranCompletions}</span>
+            <span className="text-[6px] font-bold text-gray-400 uppercase tracking-tighter">Khatm</span>
+          </div>
+        </div>
+  
+        {/* 3. FLOAT-IN TEXT DATA */}
+        <div className="ml-2 flex flex-col items-start overflow-hidden">
+          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">
+            Celestial Rank
+          </span>
+          <div className="flex items-center gap-2">
+             <h3 className="text-sm font-bold text-white tracking-wide" 
+                 style={{ textShadow: `0 0 10px ${theme.color}44` }}>
+               {theme.title}
+             </h3>
+             {/* Animated level bars */}
+             <div className="flex gap-0.5">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} 
+                       className={`w-1 h-3 rounded-full transition-all duration-500 ${i < (quranCompletions % 4) ? 'opacity-100' : 'opacity-20'}`}
+                       style={{ backgroundColor: theme.color }}></div>
+                ))}
+             </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const isSunnahDay = () => {
@@ -265,99 +366,117 @@ useEffect(() => {
   return () => window.removeEventListener('online', handleOnline);
 }, [user]); // ✅ Always keep [user] here, even if user is null
 
-  const handleAuth = async () => {
-    if (!tempName || !tempPass) return alert("Fill all fields");
-    const cleanName = tempName.toLowerCase().trim();
-    setAuthLoading(true);
-  
-    // 1. IMPROVED GEO-FETCH
-    let userCity = "Unknown City";
-    try {
-      // Try primary service
-      const geoRes = await fetch('https://ipapi.co/json/').catch(() => null);
-      if (geoRes && geoRes.ok) {
-        const geoData = await geoRes.json();
-        userCity = geoData.city || "Unknown City";
-      } else {
-        // Fallback service if first one fails
-        const backupRes = await fetch('http://ip-api.com/json/').catch(() => null);
-        if (backupRes && backupRes.ok) {
-          const backupData = await backupRes.json();
-          userCity = backupData.city || "Unknown City";
-        }
+const handleAuth = async () => {
+  if (!tempName || !tempPass) return alert("Fill all fields");
+
+  const cleanName = tempName.toLowerCase().trim();
+  const cleanPass = tempPass.trim();
+
+  // --- 1. THE OFFLINE BOUNCER (Check this BEFORE any network calls) ---
+  if (!isRegistering) {
+    const offlineAuthRaw = localStorage.getItem('qamar_offline_auth');
+    if (offlineAuthRaw) {
+      const creds = JSON.parse(offlineAuthRaw);
+      // If name and pass match what we stored last time we were online...
+      if (creds.user_name === cleanName && creds.password === cleanPass) {
+        console.log("✅ Offline Match Found! Logging in via Cache.");
+        await loadUserData(cleanName, cleanPass);
+        return; // 🚀 EXIT: Stop the function here so it doesn't touch the network.
       }
-    } catch (err) {
-      userCity = "Mingora (Est)"; // Default fallback for your region
     }
-  
-    if (isRegistering) {
-      // --- REGISTRATION LOGIC ---
-  
-      // 2. CHECK IF NAME IS TAKEN BY ANYONE (Regardless of Password)
-      const { data: similarUsers } = await supabase
-        .from('user_vaults')
-        .select('user_name')
-        .ilike('user_name', `${cleanName}%`);
-  
-      const nameExists = similarUsers?.find(u => u.user_name === cleanName);
-  
-      if (nameExists) {
-        // 3. GENERATE UNIQUE SUGGESTION (Checks against all existing names)
-        const existingNames = similarUsers?.map(u => u.user_name) || [];
-        let counter = 1;
-        let newSug = `${cleanName}${counter}`;
-        
-        // Keep incrementing until we find a name NOT in the list
-        while (existingNames.includes(newSug)) {
-          counter++;
-          newSug = `${cleanName}${counter}`;
-        }
-  
-        setSuggestion(newSug);
-        setShowSuggestionPopup(true);
-        setAuthLoading(false);
-        return;
+  }
+
+  // --- 2. NETWORK GUARD ---
+  if (!navigator.onLine) {
+    return alert("No local account found. Please connect to the internet to log in or register.");
+  }
+
+  setAuthLoading(true);
+
+  // --- 3. GEO-FETCH (Only runs if we didn't exit above) ---
+  let userCity = "Unknown City";
+  try {
+    const geoRes = await fetch('https://ipapi.co/json/');
+    const geoData = await geoRes.json();
+    userCity = geoData.city || "Mingora";
+  } catch (err) {
+    console.log("Geo-fetch failed, using default city.");
+  }
+
+  if (isRegistering) {
+    // --- REGISTRATION LOGIC ---
+    const { data: similarUsers } = await supabase
+      .from('user_vaults')
+      .select('user_name')
+      .ilike('user_name', `${cleanName}%`);
+
+    const nameExists = similarUsers?.find(u => u.user_name === cleanName);
+
+    if (nameExists) {
+      const existingNames = similarUsers?.map(u => u.user_name) || [];
+      let counter = 1;
+      let newSug = `${cleanName}${counter}`;
+      
+      while (existingNames.includes(newSug)) {
+        counter++;
+        newSug = `${cleanName}${counter}`;
       }
-  
-      // 4. CREATE NEW VAULT
-      const { error: insertError } = await supabase.from('user_vaults').insert([{
-        user_name: cleanName,
-        password: tempPass,
-        tasbeeh_count: 0,
-        fasting_days: INITIAL_FASTING_DAYS,
-        last_active: new Date().toISOString(),
-        last_location: userCity
-      }]);
-  
-      if (!insertError) {
-        await loadUserData(cleanName, tempPass);
-      } else {
-        alert("Registration failed. Please try a different name.");
-        setAuthLoading(false);
-      }
-  
+
+      setSuggestion(newSug);
+      setShowSuggestionPopup(true);
+      setAuthLoading(false);
+      return;
+    }
+
+    const { error: insertError } = await supabase.from('user_vaults').insert([{
+      user_name: cleanName,
+      password: cleanPass,
+      tasbeeh_count: 0,
+      fasting_days: INITIAL_FASTING_DAYS,
+      last_active: new Date().toISOString(),
+      last_location: userCity
+    }]);
+
+    if (!insertError) {
+      await loadUserData(cleanName, cleanPass);
     } else {
-      // --- LOGIN LOGIC ---
+      alert("Registration failed. Please try a different name.");
+      setAuthLoading(false);
+    }
+
+  } else {
+    // --- ONLINE LOGIN LOGIC ---
+    try {
       const { data: vault } = await supabase
         .from('user_vaults')
         .select('*')
         .eq('user_name', cleanName)
-        .eq('password', tempPass)
-        .single();
-  
+        .eq('password', cleanPass)
+        .maybeSingle(); // Changed .single() to .maybeSingle() for better error handling
+
       if (!vault) {
         alert("Invalid Identity or Pass-Key.");
         setAuthLoading(false);
       } else {
-        // Update location and time on login
+        // SUCCESS: Save for offline use next time!
+        localStorage.setItem('qamar_offline_auth', JSON.stringify({
+          user_name: cleanName,
+          password: cleanPass
+        }));
+
         await supabase.from('user_vaults')
           .update({ last_active: new Date().toISOString(), last_location: userCity })
           .eq('id', vault.id);
           
-        await loadUserData(cleanName, tempPass);
+        await loadUserData(cleanName, cleanPass);
       }
+    } catch (err) {
+      console.error("Supabase error:", err);
+      alert("Connection error. Try again.");
+      setAuthLoading(false);
     }
-  };
+  }
+};
   
   useEffect(() => {
     // This runs ONCE when the app first opens
@@ -785,22 +904,66 @@ if (diff <= 2000 && diff > -2000 && !celebrated) {
   const loadUserData = async (name: string, passwordInput: string) => {
     setAuthLoading(true);
     const cleanName = name.toLowerCase().trim();
+    const cleanPass = passwordInput.trim();
+  
+    console.log("--- Login Attempt ---");
     
-    // 1. LOOK FOR EXACT MATCH
+    // 1. CHECK LOCAL STORAGE (For Instant/Offline Entry)
+    const offlineAuthRaw = localStorage.getItem('qamar_offline_auth');
+    let loggedInViaCache = false;
+  
+    if (offlineAuthRaw) {
+      const creds = JSON.parse(offlineAuthRaw);
+      const isMatch = (creds.user_name === cleanName && creds.password === cleanPass);
+  
+      if (isMatch) {
+        console.log("Match found! Loading cache for instant entry...");
+        const cacheRaw = localStorage.getItem('qamar_vault_cache');
+        const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
+        
+        // Load UI immediately from cache
+        setUser({ name: cleanName });
+        setCount(cache.tasbeeh_count || 0);
+        setFastingLog(cache.fasting_days || []);
+        setQuranProgress(cache.quran_progress || 0);
+        setCheckedItems(cache.ritual_checks || []);
+        
+        setIsLoginView(false);
+        loggedInViaCache = true;
+        // We do NOT 'return' here anymore if we are online. 
+        // We want to fetch fresh data if possible.
+      }
+    }
+  
+    // 2. OFFLINE GUARD
+    if (!navigator.onLine) {
+      if (loggedInViaCache) {
+        console.log("Working Offline with cached data.");
+        setAuthLoading(false);
+        return; 
+      } else {
+        alert("Invalid Identity or Pass-Key (You are currently offline).");
+        setAuthLoading(false);
+        return;
+      }
+    }
+  
+    console.log("Syncing with Cloud for latest data...");
+    
+    // --- EXISTING SUPABASE LOGIC START ---
     let { data: vault, error } = await supabase
       .from('user_vaults')
       .select('*')
       .eq('user_name', cleanName)
       .eq('password', passwordInput)
-      .single();
+      .maybeSingle(); // Better for handling no-match
   
     if (!vault) {
-      // 2. CHECK IF NAME IS TAKEN
       let { data: nameCheck } = await supabase
         .from('user_vaults')
         .select('user_name')
         .eq('user_name', cleanName)
-        .single();
+        .maybeSingle();
   
       if (nameCheck) {
         alert("This name is already registered. Please use your correct password or a different name.");
@@ -808,7 +971,6 @@ if (diff <= 2000 && diff > -2000 && !celebrated) {
         return;
       }
   
-      // 3. REGISTER NEW USER
       const { data: newUser } = await supabase
         .from('user_vaults')
         .insert([{ 
@@ -820,6 +982,13 @@ if (diff <= 2000 && diff > -2000 && !celebrated) {
         .select().single();
       vault = newUser;
     }
+  
+    const authSnapshot = {
+      user_name: cleanName,
+      password: passwordInput,
+      last_verified: new Date().toISOString()
+    };
+    localStorage.setItem('qamar_offline_auth', JSON.stringify(authSnapshot));
   
     // 4. PREPARE DATA
     const now = new Date();
@@ -840,12 +1009,13 @@ if (diff <= 2000 && diff > -2000 && !celebrated) {
         updatedLog = [...updatedLog, ...missingDays];
     }
   
-    // 5. FINALIZE UI STATE
+    // 5. FINALIZE UI STATE (Updates cached UI with fresh DB data)
     setCount(vault.tasbeeh_count || 0);
     setFastingLog(updatedLog);
     setQuranProgress(vault.quran_progress || 0);
-    setCheckedItems(vault.ritual_checks || []); // Load your sunnah checks too!
-    setUser({ name: cleanName }); // Setting state as an object so user.name works in UI
+    setQuranCompletions(vault.quran_completions || 0); // Add this line
+    setCheckedItems(vault.ritual_checks || []);
+    setUser({ name: cleanName });
   
     // 6. NOTIFICATIONS & PWA
     if ('Notification' in window) {
@@ -857,11 +1027,9 @@ if (diff <= 2000 && diff > -2000 && !celebrated) {
     }
     
     // 7. STORAGE MANAGEMENT
-    // Keep the session key as a simple string so it doesn't break your UI
     localStorage.setItem('q_active_session', cleanName);
     localStorage.setItem('q_active_pass', passwordInput);
   
-    // Initialize the Offline Cache with a clean object
     const offlineCache = {
       user_name: cleanName,
       tasbeeh_count: vault.tasbeeh_count || 0,
@@ -874,92 +1042,103 @@ if (diff <= 2000 && diff > -2000 && !celebrated) {
   
     setAuthLoading(false);
     setIsLoginView(false);
-    setShowWelcome(true);
-    setTimeout(() => setShowWelcome(false), 2500);
+    if (!loggedInViaCache) { // Only show welcome if they weren't already jumped in by cache
+      setShowWelcome(true);
+      setTimeout(() => setShowWelcome(false), 2500);
+    }
   
-    // Trigger one sync to ensure the "Bonus Days" or Iftar auto-marks are saved to DB
     sync({ log: updatedLog }); 
   };
 
-const sync = async (payload: any) => {
-  const sessionName = localStorage.getItem('q_active_session');
-  if (!sessionName) return;
-
-  // 1. GET CURRENT LOCAL DATA (to avoid overwriting other fields)
-  let localData: any = {};
-  try {
-    const raw = localStorage.getItem('qamar_vault_cache');
-    localData = raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    localData = {};
-  }
-
-  // 2. PREPARE THE UPDATE PAYLOAD
-  const updatePayload: any = {
-    ...localData, // Keep existing cached data
-    last_active: new Date().toISOString(),
-    unsynced: !navigator.onLine // Flag to track if cloud is behind
-  };
-
-  // Map incoming payload to Database columns
-  if (payload.count !== undefined) updatePayload.tasbeeh_count = payload.count;
-  if (payload.log !== undefined) updatePayload.fasting_days = payload.log;
-  if (payload.quran !== undefined) updatePayload.quran_progress = payload.quran;
-  if (payload.checks !== undefined) updatePayload.ritual_checks = payload.checks;
-  
-  if (payload.sunnah_completed !== undefined) {
-    updatePayload.last_nightly_sunnah = payload.sunnah_completed;
-    updatePayload.tahajjud_intent = payload.tahajjud_intent;
-  }
-
-  // 3. SAVE TO LOCAL STORAGE IMMEDIATELY (Offline Safety)
-  localStorage.setItem('qamar_vault_cache', JSON.stringify(updatePayload));
-
-  // 4. PUSH TO SUPABASE (Only if Online)
-  if (navigator.onLine) {
-    try {
-      // Update Main Vault
-      const { error: vaultError } = await supabase
-        .from('user_vaults')
-        .update({
-           tasbeeh_count: updatePayload.tasbeeh_count,
-           fasting_days: updatePayload.fasting_days,
-           quran_progress: updatePayload.quran_progress,
-           ritual_checks: updatePayload.ritual_checks,
-           last_nightly_sunnah: updatePayload.last_nightly_sunnah,
-           tahajjud_intent: updatePayload.tahajjud_intent,
-           last_active: updatePayload.last_active
-        })
-        .eq('user_name', sessionName.toLowerCase().trim());
-
-      // If sunnah data exists, upsert to the Registry too
-      if (payload.sunnah_completed !== undefined) {
-        const today = new Date().toISOString().split('T')[0];
-        await supabase
-          .from('nightly_registry')
-          .upsert({ 
-              user_name: sessionName.toLowerCase().trim(), 
-              date: today, 
-              intent: payload.tahajjud_intent,
-              completed_items: payload.sunnah_completed,
-            }, 
-            { onConflict: 'user_name,date' }
-          );
-      }
-
-      if (!vaultError) {
-        console.log("Cloud Synchronized Successfully ✅");
-        // Mark as synced locally
-        updatePayload.unsynced = false;
-        localStorage.setItem('qamar_vault_cache', JSON.stringify(updatePayload));
-      }
-    } catch (err) {
-      console.error("Network request failed. Data remains cached locally.");
+  const sync = async (payload: any) => {
+    // 1. GET THE USERNAME (Check state first, then local storage)
+    // Using user?.name ensures that if the app is open, we can sync.
+    const sessionName = user?.name || localStorage.getItem('q_active_session');
+    
+    if (!sessionName) {
+      console.warn("Sync skipped: No active user found.");
+      return;
     }
-  } else {
-    console.log("Offline: Changes saved to local cache. Will sync when online.");
-  }
-};
+  
+    const cleanName = sessionName.toLowerCase().trim();
+  
+    // 2. GET CURRENT LOCAL DATA
+    let localData: any = {};
+    try {
+      const raw = localStorage.getItem('qamar_vault_cache');
+      localData = raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      localData = {};
+    }
+  
+    // 3. PREPARE THE UPDATE PAYLOAD
+    // We merge the incoming payload into our existing local data
+    const updatePayload: any = {
+      ...localData,
+      user_name: cleanName, // Ensure the cache is always tagged to the user
+      last_active: new Date().toISOString(),
+      unsynced: !navigator.onLine 
+    };
+  
+    // Map incoming payload to keys
+    if (payload.count !== undefined) updatePayload.tasbeeh_count = payload.count;
+    if (payload.log !== undefined) updatePayload.fasting_days = payload.log;
+    if (payload.quran !== undefined) updatePayload.quran_progress = payload.quran;
+    if (payload.checks !== undefined) updatePayload.ritual_checks = payload.checks;
+    if (payload.completions !== undefined) updatePayload.quran_completions = payload.completions;
+    if (payload.sunnah_completed !== undefined) {
+      updatePayload.last_nightly_sunnah = payload.sunnah_completed;
+      updatePayload.tahajjud_intent = payload.tahajjud_intent;
+    }
+  
+    // 4. SAVE TO LOCAL STORAGE IMMEDIATELY (This fixes your tapping issue)
+    localStorage.setItem('qamar_vault_cache', JSON.stringify(updatePayload));
+    console.log("Local cache updated successfully 💾");
+  
+    // 5. PUSH TO SUPABASE (Only if Online)
+    if (navigator.onLine) {
+      try {
+        const { error: vaultError } = await supabase
+          .from('user_vaults')
+          .update({
+             tasbeeh_count: updatePayload.tasbeeh_count,
+             fasting_days: updatePayload.fasting_days,
+             quran_progress: updatePayload.quran_progress,
+             quran_completions: updatePayload.quran_completions, 
+             ritual_checks: updatePayload.ritual_checks,
+             last_nightly_sunnah: updatePayload.last_nightly_sunnah,
+             tahajjud_intent: updatePayload.tahajjud_intent,
+             last_active: updatePayload.last_active
+          })
+          .eq('user_name', cleanName);
+  
+        if (payload.sunnah_completed !== undefined) {
+          const today = new Date().toISOString().split('T')[0];
+          await supabase
+            .from('nightly_registry')
+            .upsert({ 
+                user_name: cleanName, 
+                date: today, 
+                intent: payload.tahajjud_intent,
+                completed_items: payload.sunnah_completed,
+              }, 
+              { onConflict: 'user_name,date' }
+            );
+        }
+  
+        if (!vaultError) {
+          console.log("Cloud Synchronized Successfully ✅");
+          // Mark as synced locally once cloud confirms
+          const finalData = { ...updatePayload, unsynced: false };
+          localStorage.setItem('qamar_vault_cache', JSON.stringify(finalData));
+        }
+      } catch (err) {
+        console.error("Cloud sync failed, data kept locally.");
+      }
+    } else {
+      console.log("Offline: Data stored locally only.");
+    }
+  };
 
 // const sync = async (payload: any) => {
 //   const sessionName = localStorage.getItem('q_active_session');
@@ -1221,9 +1400,13 @@ const sync = async (payload: any) => {
           >
             <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 border-b border-current/10 pb-8">
               <div>
-                <h1 className="text-3xl font-black italic uppercase leading-none">{user?.name}</h1>
+              
+                <h1 className="text-3xl text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)] font-black italic uppercase leading-none">{user?.name}</h1>
+                
                 <p className="text-[9px] font-black opacity-20 uppercase tracking-[0.3em] mt-2">The Basirah Companion</p>
+                
               </div>
+              
               <div className="flex items-center gap-4">
                 <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-3 opacity-40 hover:opacity-100">
                   {soundEnabled ? <Volume2 size={18}/> : <VolumeX size={18}/>}
@@ -1533,9 +1716,15 @@ const sync = async (payload: any) => {
                 <h3 className="text-xl font-black uppercase italic flex items-center gap-3"><ScrollText size={24}/> The Great Archive</h3>
                 <button onClick={() => setArchiveOpen(false)} className="p-3 border-2 border-[#2D2D2A] rounded-full hover:bg-[#2D2D2A] hover:text-white transition-all"><X size={20}/></button>
               </div>
+              <div className="flex items-center gap-4">
+              {renderQuranBadge()}
+              </div>
               <div className="flex-1 overflow-y-auto p-8 md:p-12">
+                
                 <div className="mb-20">
+                
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                  
                     <h4 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 border-b border-black/10 pb-2 flex-1">Quran Completion Journey</h4>
                     <div className="text-right">
                        <span className="text-4xl font-black italic">{Math.round((quranProgress/30)*100)}%</span>
@@ -1547,7 +1736,7 @@ const sync = async (payload: any) => {
                   </div>
                   <div className="grid grid-cols-5 sm:grid-cols-10 gap-3">
                     {[...Array(30)].map((_, i) => (
-                      <div key={i} onClick={() => {setQuranProgress(i+1); sync({quran: i+1});}} className={`aspect-square border-2 border-[#2D2D2A] rounded-xl flex items-center justify-center font-black cursor-pointer text-xs transition-all ${i < quranProgress ? 'bg-[#2D2D2A] text-white' : 'hover:bg-black/5 opacity-40'}`}>
+                      <div key={i} onClick={() => {updateQuran(i+1); sync({quran: i+1});}} className={`aspect-square border-2 border-[#2D2D2A] rounded-xl flex items-center justify-center font-black cursor-pointer text-xs transition-all ${i < quranProgress ? 'bg-[#2D2D2A] text-white' : 'hover:bg-black/5 opacity-40'}`}>
                         {i < quranProgress ? <CheckCircle2 size={12}/> : i+1}
                       </div>
                     ))}
