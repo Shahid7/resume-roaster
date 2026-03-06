@@ -250,12 +250,22 @@ const PROJECTS = [
     date: "LIVE",
     color: "from-orange-400/20 to-amber-900/20"
   },
-  ...Array.from({ length: 8 }).map((_, i) => {
-    const dayNumber = 1 + i;
+  {
+    title: "Sunnah Stream",
+    desc: "Neural-linked habit engine for prophetic traditions. Level up your spiritual frequency.",
+    path: "/sunnah-stream",
+    icon: <Zap />,
+    vibe: "momentum",
+    status: "unlocked",
+    date: "LIVE",
+    color: "from-emerald-600/20 to-zinc-900/20"
+  },
+  ...Array.from({ length: 7 }).map((_, i) => {
+    const dayNumber = 4 + i;
     const displayDate = `${dayNumber + 3} March`;
     
     return {
-      title: `Project ${i + 23}`,
+      title: `Project ${i + 24}`,
       desc: "A classified AI experiment currently in development.",
       path: "#",
       icon: <Cpu />,
@@ -496,6 +506,25 @@ useEffect(() => {
       />
     ))}
     
+  </div>
+)}
+
+{/* SUNNAH STREAM NOOR PULSE (PROJECT 23) */}
+{!isLocked && project.title === "Sunnah Stream" && (
+  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
+    <motion.div 
+      animate={{ 
+        boxShadow: ["0 0 20px rgba(16,185,129,0)", "0 0 50px rgba(16,185,129,0.2)", "0 0 20px rgba(16,185,129,0)"] 
+      }}
+      transition={{ duration: 2, repeat: Infinity }}
+      className="absolute inset-0 border border-emerald-500/20 m-2 rounded-[2.5rem]"
+    />
+    <div className="absolute top-4 right-8 font-mono text-[7px] text-emerald-400/50 tracking-[0.5em] uppercase">Frequency_Aligned</div>
+    <motion.div 
+      animate={{ x: [-100, 400] }}
+      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+      className="absolute top-0 left-0 w-20 h-full bg-gradient-to-r from-transparent via-emerald-500/5 to-transparent skew-x-12"
+    />
   </div>
 )}
 
